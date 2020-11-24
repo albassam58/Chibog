@@ -8,6 +8,7 @@ Repository for chibog
 2. Run `npm install`
 3. Run `php artisan migrate`
 4. Run `php artisan db:seed`
+5. Copy & paste the **.env.example** and rename it to **.env** 
 
 After you run `php artisan db:seed`, it will create a user:
 
