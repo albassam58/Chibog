@@ -9,6 +9,10 @@ Repository for chibog
 3. Run `php artisan migrate`
 4. Run `php artisan db:seed`
 
+After you run `php artisan db:seed`, it will create a user:
+
+Your default email/password for web & vendor is: **admin@admin.com / admin**
+
 ## Start your laravel app:
 
 1. Run `php artisan serve`
