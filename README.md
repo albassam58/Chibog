@@ -1,6 +1,10 @@
 # Chibog
 Repository for chibog
 
+- Laravel 8
+- Vue 2.6.12
+- Vuex 3.5.1
+- Vuetify 2.3.10
 
 ## Setup:
 
