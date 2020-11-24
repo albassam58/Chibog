@@ -1,0 +1,81 @@
+Users
+
+Vendors
+	id
+	first_name
+	last_name
+	province_id
+	city_id
+	barangay_id
+	picture
+	street
+	mobile_number
+	email
+	--------------------
+	Stores
+		id
+		vendor_id
+		name
+		description
+		logo
+		province
+		city
+		barangay
+		street
+		type // next day delivery, same day delivery
+		schedule_day
+		schedule_time_in
+		schedule_time_out
+		status
+		-------------------------
+		Store Reviews
+			id
+			store_id
+			first_name
+			last_name
+			comment
+			rate
+		Items
+			id
+			store_id
+			name
+			description
+			food_type_id // chicken, seafoods,
+			cuisine_id // American, Italian
+			meal // 1. Breakfast, 2. Lunch, 3. Snacks, 4. Dinner
+			amount
+			discount
+			status
+			---------------------------
+			Item Reviews
+				id
+				item_id
+				first_name
+				last_name
+				comment
+				rate
+			Item Pictures
+				id
+				item_id
+				path
+			Food Types
+				id
+				name
+			Cuisines
+				id
+				name
+		Orders
+			id
+			store_id
+			item_id
+			amount
+			quantity
+			special_instruction
+			customer_first_name
+			customer_last_name
+			customer_province
+			customer_city
+			customer_barangay
+			customer_street
+			customer_mobile_number
+			customer_email
