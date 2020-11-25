@@ -184,11 +184,18 @@
 		    	let isDayAvailable = days[currentDay - 1];
 
 				if (isDayAvailable && timein.isBefore(currentTime) && currentTime.isBefore(timeout)) {
+
+					// tell to the parent that it's available
+					vm.$emit('is-available', true);
+
 					return {
 						color: 'green',
 						text: 'OPEN'
 					};
 				}
+
+				// tell to the parent that it's not available
+				vm.$emit('is-available', false);
 
 				return {
 					color: 'red',

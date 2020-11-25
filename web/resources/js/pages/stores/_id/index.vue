@@ -15,7 +15,7 @@
 
 		<v-row v-if="store && !(Object.keys(store).length === 0 && store.constructor === Object)">
 			<v-col cols="12" sm="6" md="4">
-				<store-card :vendorUrl="vendorUrl" :store="store" :hasRating="true"></store-card>
+				<store-card v-on:is-available="availability" :vendorUrl="vendorUrl" :store="store" :hasRating="true"></store-card>
 			</v-col>
 
 			<!-- MENU -->
@@ -47,20 +47,22 @@
 						        	<tr
 						          		v-for="item in items"
 						          		:key="item.name"
+						          		v-if="item.name"
+						          		:class="isAvailable ? '' : 'text--disabled'"
 						        	>
 						          		<td class="text-left">{{ item ? item.name : "" }}</td>
 						          		<td class="text-right">
-						          			{{ item.amount.toFixed(2) }}
+						          			{{ parseFloat(item.amount).toFixed(2) }}
 						          		</td>
 						          		<td class="text-center">
 						          			<v-icon
-						          				color="error"
+						          				:color="isAvailable ? 'error' : 'grey'"
 						          				class="mr-4"
 						          				@click="decrement(item)"
 						          			>mdi-minus</v-icon>
 						          			{{ item.quantity || 0 }}
 						          			<v-icon
-						          				color="primary"
+						          				:color="isAvailable ? 'primary' : 'grey'"
 						          				class="ml-4"
 						          				@click="increment(item)"
 						          			>mdi-plus</v-icon>
@@ -74,7 +76,7 @@
 						</v-simple-table>
 					</v-col>
 				</v-row>
-				<v-row>
+				<v-row :class="isAvailable ? '' : 'text--disabled'">
 					<v-col cols="12" sm="12" md="4" class="text-left">
 						<strong>Total</strong>
 					</v-col>
@@ -84,8 +86,8 @@
 				</v-row>
 				<v-row>
 					<v-col cols="12" class="text-right">
-						<v-btn @click="addToCart" v-if="isUpdate">Update Cart</v-btn>
-						<v-btn @click="addToCart" v-else>Add to Cart</v-btn>
+						<v-btn @click="addToCart" :disabled="!isAvailable" v-if="isUpdate">Update Cart</v-btn>
+						<v-btn @click="addToCart" :disabled="!isAvailable" v-else>Add to Cart</v-btn>
 					</v-col>
 				</v-row>
 			</v-col>
@@ -153,6 +155,7 @@
 				groupedItems: [],
 				form: {},
 				grandTotal: 0,
+				isAvailable: true,
 				vendorUrl: "",
 	      		isUpdate: false,
 	      		replaceCartDialog: false,
@@ -229,8 +232,14 @@
 				'saveByStore': 'orders/saveByStore',
 				'updateByStore': 'orders/updateByStore'
 			}),
+			availability(val) {
+				let vm = this;
+				vm.isAvailable = val;
+			},
 			async addToCart() {
 				let vm = this;
+
+				if (!vm.isAvailable) return; // don't do anything if not available
 
 				if (vm.hasOrder && !vm.isUpdate) {
 					// already has order but will make a new order, add a warning message
@@ -244,7 +253,7 @@
 				let vm = this;
 
 				// remove grouped by meals (breakfash, lunch, snacks, dinner)
-				const ungroupedItems = _.flatMap(vm.items);
+				const ungroupedItems = _.flatMap(vm.groupedItems);
 
 				if (vm.user) {
 					vm.form = {
@@ -299,6 +308,12 @@
 				vm.groupedItems = _.groupBy(vm.items, function(object) {
 					return object.meal;
 				});
+
+				for (let index in vm.groupedItems) {
+					if (index === "undefined") {
+						delete vm.groupedItems[index];
+					}
+				}
 			},
 			updateItemList() {
 				let vm = this;
@@ -340,6 +355,8 @@
 			increment(item) {
 				let vm = this;
 
+				if (!vm.isAvailable) return; // don't do anything if not available
+
 				if (!_.has(item, 'quantity')) vm.$set(item, 'quantity', 0);
 				if (item.quantity < 100) {
 					vm.$set(item, 'quantity', item.quantity + 1);
@@ -347,6 +364,8 @@
 			},
 			decrement(item) {
 				let vm = this;
+
+				if (!vm.isAvailable) return; // don't do anything if not available
 				
 				if (!_.has(item, 'quantity')) vm.$set(item, 'quantity', 0);
 				if (item.quantity > 0) {

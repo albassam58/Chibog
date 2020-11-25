@@ -92,7 +92,7 @@ class StoreController extends BaseController
         $request->merge([
             'vendor_id'       => Auth::user()->id,
             'schedule_day'  => implode(',', $request->schedule_day),
-            'status'        => 1
+            'status'        => 2
         ]);
 
         $store = Store::create($request->all());

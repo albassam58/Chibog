@@ -48,7 +48,7 @@ class ItemController extends BaseController
     public function store(Request $request)
     {
         $request->merge([
-            'status'        => 1
+            'status'        => 5 // not available
         ]);
 
         $item = Item::create($request->all());
