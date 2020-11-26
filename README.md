@@ -23,3 +23,10 @@ Your default email/password for web & vendor is: **admin@admin.com / admin**
 1. Run `php artisan serve`
 2. Run `php artisan queue:listen --queue=emails` to send an email for ordering/email verification
 3. Run `npm run watch`
+
+## Start your socket for notification
+
+1. Find `BROADCAST_DRIVER` in your **.env** and change it to `BROADCAST_DRIVER=redis`
+2. Go to **web** folder and run `node socket.js`
+3. Go to **vendor** folder and run `node socket.js`
+4. Once the consumer orders, the vendor will receive a notification
