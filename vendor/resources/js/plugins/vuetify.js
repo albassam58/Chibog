@@ -12,7 +12,7 @@ const opts = {
         		primary: colors.blue,
         		secondary: colors.grey.darken1,
         		accent: colors.shades.black,
-        		error: colors.red.accent3,
+        		error: colors.red.darken3,
         		background: colors.indigo.lighten5
       		},
 	      	dark: {

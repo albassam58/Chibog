@@ -1,6 +1,7 @@
 <template>
 	<v-container>
 
+		<!-- logged out but verified thru email link -->
 		<div v-if="Object.entries(verification).length">
 			<div v-if="verification.success">
 				{{ verification.message }}
@@ -29,7 +30,7 @@
 		</div>
 
 		<!-- logged in -->
-		<div v-else-if="Object.entries(vendor).length">
+		<div v-else-if="vendor">
 			<div v-if="vendor.email_verified_at">
 				Already verified
 				<router-link to="/">Home</router-link>
@@ -55,6 +56,7 @@
 		data: () => ({
 			alreadyVerified: false,
 			verificationError: false,
+			vendor: JSON.parse(localStorage.getItem('current_vendor'))
 		}),
 		async created() {
 			let vm = this;
@@ -72,7 +74,7 @@
 						vm.alreadyVerified = true;
 					}
 				}
-			} else if (_.isEmpty(vm.vendor)) {
+			} else if (!vm.vendor) {
 				vm.$router.push('/login');
 			}
 		},
@@ -80,10 +82,6 @@
 			...mapState('verification', {
 				verification: state => state.verification,
 				resent: state => state.resent
-			}),
-			...mapState('currentVendor', {
-				status: state => state.status,
-				vendor: state => state.vendor
 			}),
 		},
 		methods: {

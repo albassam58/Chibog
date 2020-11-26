@@ -1,7 +1,6 @@
 const state = {
 	vendor: {},
 	status: {
-		registered: false,
 		loggedIn: false
 	}
 };
@@ -20,9 +19,7 @@ const actions = {
 				commit('setVendor', data.data);
 			}
 		} catch (err) {
-			console.log(err);
 			throw err;
-			// logoutVendor();
 		}
 	},
 	async loginVendor({commit}, vendor) {
@@ -34,19 +31,15 @@ const actions = {
 
 			localStorage.setItem('api_token', `Bearer ${ data.data.api_token }`);
 			localStorage.setItem('current_vendor', JSON.stringify(data.data));
-
-			commit('loginSuccess', data.data);
 		} catch (err) {
-			commit('loginFailure');
 			throw err;
 		}
 	},
 	async registerVendor({commit}, vendor) {
 		try {
-			let { data } = await axios.post('/v1/vendor/register', vendor);
-			commit('setVendor', data.data);
+			await axios.post('/v1/vendor/register', vendor);
 		} catch (err) {
-			commit('registerFailure');
+			throw err;
 		}
 	},
 	async logoutVendor() {
@@ -57,12 +50,12 @@ const actions = {
 			localStorage.removeItem('current_vendor');
 
 			state.status = {
-				registered: false,
 				loggedIn: false
 			}
+
 			state.vendor = {};
 		} catch (err) {
-			console.log(err);
+			throw err;
 		}
 	}
 };
@@ -71,20 +64,6 @@ const mutations = {
 		state.vendor = vendor;
 		state.status.loggedIn = true;
 	},
-	loginSuccess(state, vendor) {
-		state.status.loggedIn = true;
-		state.vendor = vendor;
-	},
-	loginFailure(state) {
-		state.status.loggedIn = false;
-		state.vendor = {};
-	},
-	registerSuccess(state) {
-		state.status.registered = true;
-	},
-	registerFailure(state) {
-		state.status.registered = false;
-	}
 };
 
 export default {
