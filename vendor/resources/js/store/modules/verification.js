@@ -1,6 +1,6 @@
 const state = {
 	verification: {},
-	resent: {},
+	resent: null,
 };
 const getters = {};
 const actions = {
@@ -22,9 +22,9 @@ const actions = {
 	async resend({ commit }, { id, email }) {
 		try {
 			let { data } = await axios.get(`/v1/vendor/resend/${ id }/${ email }`);
-			commit('setResent', data);
+			commit('setResent', data.data);
 		} catch (err) {
-			commit('setResent', err.response.data);
+			commit('setResent', err.response ? err.response.data : err.message);
 			throw err;
 		}
 	}
