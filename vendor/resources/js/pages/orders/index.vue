@@ -9,7 +9,17 @@
 
 				TOTAL QUANTITY PER ITEM
 			-->
-			<div class="text-h4 mb-6">Orders</div>
+			<v-row>
+				<v-col cols="6" class="d-flex flex-row">
+					<div class="text-h4 mb-4">Orders</div>
+				</v-col>
+				<v-col cols="6" class="d-flex flex-row-reverse">
+					<v-btn color="secondary" dark @click="$router.back(-1)" text>
+						<v-icon>mdi-arrow-left</v-icon>
+						Back
+					</v-btn>
+				</v-col>
+			</v-row>
 			<v-row>
 				<v-col cols="12" sm="12" md="4">
 					<v-text-field	
@@ -499,6 +509,16 @@
 		}),
 		async created() {
 			let vm = this;
+
+			if (vm.$route.query && vm.$route.query.search) {
+				// vm.$store.commit('orders/setParams', {
+				// 	page: 1,
+				// 	search: vm.$route.query.search
+				// });
+
+				vm.search = vm.$route.query.search
+			}
+
 			await vm.fetchByVendor();
 		},
 		computed: {
@@ -668,6 +688,10 @@
 				vm.$store.commit('orders/setParams', { page: 1, search: query });
 				await vm.fetchByVendor();
 				vm.searchLoading = false;
+
+				let url = `/orders?search=${ query }`;
+				if (vm.$route.fullPath !== url)
+				vm.$router.push(`/orders?search=${ query }`);
 		    }, 500),
 		    increment(food) {
 				let vm = this;

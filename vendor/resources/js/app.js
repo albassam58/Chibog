@@ -46,6 +46,10 @@ Vue.use(require('vue-moment'));
 
 Vue.mixin({
 	methods: {
+		setParams(storeModule, params) {
+			let vm = this;
+            vm.$store.commit(`${ storeModule }/setParams`, params);
+        },
 		appendLocalStorage(key, newVal) {
 		    // Parse any JSON previously stored in key
 		    var existingEntries = JSON.parse(localStorage.getItem(key));

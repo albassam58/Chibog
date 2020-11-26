@@ -16,6 +16,7 @@ use App\Http\Controllers\API\v1\CuisineController;
 use App\Http\Controllers\API\v1\FoodTypeController;
 use App\Http\Controllers\API\v1\OrderController;
 use App\Http\Controllers\API\v1\StatisticController;
+use App\Http\Controllers\API\v1\OrderNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,16 +50,30 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:api'], function() {
 		Route::get('/current', [VendorController::class, 'currentUser']);
 		Route::post('/logout', [LoginController::class, 'logout']);
 	});
+
+	// stores
 	Route::get('/stores/vendor', [StoreController::class, 'vendor']);
 	Route::post('/stores/upload', [StoreController::class, 'upload']);
 	Route::apiResource('stores', StoreController::class);
+
 	Route::apiResource('cuisines', CuisineController::class);
 	Route::apiResource('food-types', FoodTypeController::class);
 	Route::apiResource('items', ItemController::class);
+
+	// orders
 	Route::post('/orders/update/status', [OrderController::class, 'updateStatus']);
 	Route::get('/orders/vendor', [OrderController::class, 'vendor']);
 	Route::apiResource('orders', OrderController::class);
 
+	// order notifications
+	Route::get('/order-notifications/vendor', [OrderNotificationController::class, 'vendor']);
+	Route::get('/order-notifications/vendor/popup', [OrderNotificationController::class, 'popup']);
+	Route::get('/order-notifications/count/unread', [OrderNotificationController::class, 'countUnread']);
+	Route::put('/order-notifications/read/checked/{ids}', [OrderNotificationController::class, 'readChecked']);
+	Route::delete('/order-notifications/delete/checked/{ids}', [OrderNotificationController::class, 'destroyChecked']);
+	Route::apiResource('order-notifications', OrderNotificationController::class);
+
+	// statistics
 	Route::get('/statistics/sales', [StatisticController::class, 'sales']);
 	Route::get('/statistics/orders', [StatisticController::class, 'orders']);
 	Route::get('/statistics/total-sales', [StatisticController::class, 'totalSales']);

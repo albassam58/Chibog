@@ -15,28 +15,8 @@
                     </router-link>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <div>
-                    <v-tooltip
-                        v-if="status.loggedIn"
-                        bottom
-                    >
-                        <template v-slot:activator="{ on }">
-                            <v-badge
-                                v-on="on"
-                                color="red"
-                                content="6"
-                                overlap
-                                offset-x="24"
-                                offset-y="25"
-                                class="mr-2"
-                            >
-                                <v-btn icon>
-                                    <v-icon>mdi-email</v-icon>
-                                </v-btn>
-                            </v-badge>
-                        </template>
-                        <span>Notifications</span>
-                    </v-tooltip>
+                <div v-if="status.loggedIn">
+                    <order-notification ref="orderNotificationRef"></order-notification>
                 </div>
                 <div>
                     <v-tooltip
@@ -120,7 +100,7 @@
             </v-app-bar>
 
             <!--  v-if="!Object.entries(vendor).length || (Object.entries(vendor).length && vendor.email_verified_at && !$route.query.queryUrl)" -->
-            <router-view />
+            <router-view :key="$route.fullPath" />
 
             <!-- <div v-else-if="alreadyVerified">
                 Already verified!
@@ -141,9 +121,13 @@
     </v-app>
 </template>
 <script type="text/javascript">
-	import { mapGetters, mapState, mapActions } from 'vuex';
+	import { mapGetters, mapState, mapActions } from 'vuex'
+    import OrderNotification from '@components/OrderNotificationComponent'
 
 	export default {
+        components: {
+            OrderNotification
+        },
 		data: () => ({
             alreadyVerified: false,
 		}),
@@ -155,6 +139,19 @@
 
             // set dark mode
             vm.$vuetify.theme.dark = darkMode === 'true' ? true : false;
+
+            // Connect to Socket.io
+            let socket = io(`http://localhost:3000`);
+
+            // ... listen for new events/messages
+            socket.on(`order-${ vm.vendor.id }:App\\Events\\Order`, data => {
+                vm.fetchNotificationVendor();
+                vm.$refs.orderNotificationRef.updateOrderNotification(data.data);
+                console.log(data.data);
+                // if (this.activeChannel == channel.id) {
+                //     this.messages.push(data.data);
+                // }
+            });
 		},
 		computed: {
 			...mapState('currentVendor', {
@@ -167,6 +164,7 @@
 		},
 		methods: {
 			...mapActions({
+                'fetchNotificationVendor': 'orderNotifications/fetchVendor',
 				'getVendor': 'currentVendor/getVendor',
 				'logoutVendor': 'currentVendor/logoutVendor',
                 'resend': 'verification/resend'
@@ -178,24 +176,9 @@
                 localStorage.setItem('darkMode', darkMode);
                 vm.$vuetify.theme.dark = darkMode;
             },
-            // async resendVerification() {
-            //     let vm = this;
-
-            //     try {
-            //         let id = vm.vendor.id;
-            //         let email = vm.vendor.email;
-
-            //         await vm.resend({ id: id, email: email });
-            //     } catch (err) {
-            //         console.log(err);
-            //         if (err.response.status == 422) {
-            //             vm.alreadyVerified = true;
-            //         }
-            //     }
-            // },
-			logout() {
+			async logout() {
 				let vm = this;
-				vm.logoutVendor();
+				await vm.logoutVendor();
 
                 window.location.href = "/login";
 			}
