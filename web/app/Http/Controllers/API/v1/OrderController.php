@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\v1;
 
+use App\Events\Order as OrderNotification;
 use App\Http\Controllers\API\v1\BaseController;
 use App\Http\Controllers\SendMailController;
 use App\Models\Order;
@@ -244,6 +245,14 @@ class OrderController extends BaseController
             }
 
             DB::commit();
+
+            // broadcast an event to notify the vendor
+            // this will go to socket.js
+            $notification = [
+                'message' => 'An order has been made.',
+                'data' => $response
+            ];
+            event(new OrderNotification("order-" . $vendor->id, $notification));
 
             return $this->sendResponse($response);
         } catch(\Exception $e) {

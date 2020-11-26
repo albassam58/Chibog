@@ -37,7 +37,7 @@
                         <v-icon>mdi-cart</v-icon>
                     </v-btn>
                 </v-badge>
-                <v-badge
+                <!-- <v-badge
                     v-if="status.loggedIn"
                     color="red"
                     content="6"
@@ -49,7 +49,7 @@
                         icon>
                         <v-icon>mdi-email</v-icon>
                     </v-btn>
-                </v-badge>
+                </v-badge> -->
                 <v-menu
                     v-if="status.loggedIn"
                     left

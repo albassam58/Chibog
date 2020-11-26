@@ -8,8 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 class BaseController extends Controller
 {
-	public function applySearch($builder, $search = [ "query" => "", "columns" => [] ], $filters = "", $paginate = true)
+	public function applySearch($builder, $search = null, $filters = "", $paginate = true)
 	{
+		if ($search === null) {
+			$search = [ "query" => "", "columns" => [] ];
+		}
+		
 		$query = $search['query'];
 		$columns = $search['columns'];
 		$filters = @json_decode($filters);
