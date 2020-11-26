@@ -1,17 +1,22 @@
 <template>
 	<v-container>
+		<!-- resent verification -->
+		<div v-if="resent">
+			{{ resent }}
+			<v-btn @click="resendVerification">Resend</v-btn>
+		</div>
 
 		<!-- logged out but verified thru email link -->
-		<div v-if="Object.entries(verification).length">
+		<div v-else-if="Object.entries(verification).length">
 			<div v-if="verification.success">
 				{{ verification.message }}
-				<router-link v-if="!Object.entries(vendor).length" to="/login">Login</router-link>
+				<router-link v-if="!vendor" to="/login">Login</router-link>
 				<router-link v-else to="/">Home</router-link>
 			</div>
 			<div v-else>
 				{{ verification.message }}
 				<div v-if="alreadyVerified">
-					<router-link v-if="!Object.entries(vendor).length" to="/login">Login</router-link>
+					<router-link v-if="!vendor" to="/login">Login</router-link>
 					<router-link v-else to="/">Home</router-link>
 				</div>
 				<div v-else-if="verificationError">
@@ -21,12 +26,6 @@
 					Invalid link provided.
 				</div>
 			</div>
-		</div>
-
-		<!-- resent verification -->
-		<div v-else-if="Object.entries(resent).length">
-			{{ resent.data }}
-			<v-btn @click="resendVerification">Resend</v-btn>
 		</div>
 
 		<!-- logged in -->
@@ -104,7 +103,7 @@
 
 					await vm.resend({ id: id, email: email });
 				} catch (err) {
-					if (err.response.status == 422) {
+					if (err.response && err.response.status == 422) {
 						vm.alreadyVerified = true;
 					}
 				}
