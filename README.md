@@ -26,7 +26,8 @@ Your default email/password for web & vendor is: **admin@admin.com / admin**
 
 ## Start your socket for notification
 
-1. Find `BROADCAST_DRIVER` in your **.env** and change it to `BROADCAST_DRIVER=redis`
-2. Go to **web** folder and run `node socket.js`
-3. Go to **vendor** folder and run `node socket.js`
-4. Once the consumer orders, the vendor will receive a notification
+1. You need to install redis in your local machine, if you're using windows, download the file here: [Redis-x64-3.0.504.msi](https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504)
+2. Find `BROADCAST_DRIVER` in your **.env** and change it to `BROADCAST_DRIVER=redis`
+3. Go to **web** folder and run `node socket.js`
+4. Go to **vendor** folder and run `node socket.js`
+5. Once the consumer orders, the vendor will receive a notification
