@@ -37,8 +37,8 @@ request.interceptors.response.use(function (response) {
     // unauthorized
     if (error.response.status == 401) {
         // logout user
-        // localStorage.removeItem('api_token');
-        // localStorage.removeItem('current_vendor');
+        localStorage.removeItem('api_token');
+        localStorage.removeItem('current_vendor');
         window.location.href = "/";
 
         return;

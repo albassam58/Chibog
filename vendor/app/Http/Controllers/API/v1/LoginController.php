@@ -28,10 +28,10 @@ class LoginController extends BaseController
 			}
 
 			throw new ModelNotFoundException('Invalid email or password');
-		} catch (ModelNotFoundException $error) {
-			return $this->sendError("Invalid email or password", [], 401);
-		} catch(\Exception $error) {
-			return $this->sendError($error->getMessage());
+		} catch (ModelNotFoundException $e) {
+			return $this->sendError("Invalid email or password", [], 400);
+		} catch(\Exception $e) {
+			return $this->sendError($e->getMessage());
 		}
 	}
 
