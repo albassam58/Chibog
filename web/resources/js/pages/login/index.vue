@@ -77,10 +77,10 @@
         },
         // Waiting for the callback.blade.php message... (token and username).
         mounted () {
-          window.addEventListener('message', this.onMessage, false)
+            window.addEventListener('message', this.onMessage, false)
         },
         beforeDestroy () {
-          window.removeEventListener('message', this.onMessage)
+            window.removeEventListener('message', this.onMessage)
         },
 		methods: {
             ...mapActions('currentUser', ['loginUser', 'getUser']),
