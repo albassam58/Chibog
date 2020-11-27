@@ -43,13 +43,12 @@ Route::group(['prefix' => 'v1'], function() {
 Route::group(['prefix' => 'v1/vendor'], function() {
 	Route::post('/login', [LoginController::class, 'authenticate']);
 	Route::post('/register', [RegisterController::class, 'register']);
+
+	Route::get('/current', [VendorController::class, 'currentUser'])->middleware(['auth:api', 'vendor_is_verified']);
+	Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:api');
 });
 
-Route::group(['prefix' => 'v1', 'middleware' => 'auth:api'], function() {
-	Route::group(['prefix' => 'vendor'], function() {
-		Route::get('/current', [VendorController::class, 'currentUser']);
-		Route::post('/logout', [LoginController::class, 'logout']);
-	});
+Route::group(['prefix' => 'v1', 'middleware' => ['auth:api', 'vendor_is_verified']], function() {
 
 	// stores
 	Route::get('/stores/vendor', [StoreController::class, 'vendor']);
