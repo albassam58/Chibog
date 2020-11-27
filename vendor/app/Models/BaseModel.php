@@ -23,7 +23,7 @@ class BaseModel extends Model
 	            $model->updated_by = $user->id;
 	        }
 
-            $user = auth('api')->user();
+            $user = auth('sanctum')->user();
 
             if ($user) {
                 $model->created_by = $user->id;
@@ -39,7 +39,7 @@ class BaseModel extends Model
             	$model->updated_by = $user->id;
             }
 
-            $user = auth('api')->user();
+            $user = auth('sanctum')->user();
 
             if ($user) {
                 $model->updated_by = $user->id;

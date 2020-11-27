@@ -15,7 +15,7 @@
                     </router-link>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <div v-if="status.loggedIn">
+                <div v-if="authenticated">
                     <order-notification ref="orderNotificationRef"></order-notification>
                 </div>
                 <div>
@@ -45,7 +45,7 @@
                 </div>
 
                 <v-menu
-                    v-if="status.loggedIn"
+                    v-if="authenticated"
                     left
                     bottom
                 >
@@ -140,27 +140,27 @@
             // set dark mode
             vm.$vuetify.theme.dark = darkMode === 'true' ? true : false;
 
-            // Connect to Socket.io
-            let socket = io(`http://localhost:3000`);
+            if (vm.vendor) {
+                // Connect to Socket.io
+                let socket = io(`http://localhost:3000`);
 
-            // ... listen for new events/messages
-            socket.on(`order-${ vm.vendor.id }:App\\Events\\Order`, data => {
-                vm.fetchNotificationVendor();
-                vm.$refs.orderNotificationRef.updateOrderNotification(data.data);
-                console.log(data.data);
-                // if (this.activeChannel == channel.id) {
-                //     this.messages.push(data.data);
-                // }
-            });
+                // ... listen for new events/messages
+                socket.on(`order-${ vm.vendor.id }:App\\Events\\Order`, data => {
+                    vm.fetchNotificationVendor();
+                    vm.$refs.orderNotificationRef.updateOrderNotification(data.data);
+                    console.log(data.data);
+                    // if (this.activeChannel == channel.id) {
+                    //     this.messages.push(data.data);
+                    // }
+                });
+            }
 		},
 		computed: {
-			...mapState('currentVendor', {
-				status: state => state.status,
-				vendor: state => state.vendor
-			}),
-            ...mapState('verification', {
-                verification: state => state.verification
-            })
+			...mapState({
+				authenticated: state => state.currentVendor.authenticated,
+				vendor: state => state.currentVendor.vendor,
+                verification: state => state.verification.verification
+			})
 		},
 		methods: {
 			...mapActions({

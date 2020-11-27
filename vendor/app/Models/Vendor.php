@@ -7,10 +7,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 
 class Vendor extends BaseModel
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory;
 
     /*
         Status:
@@ -60,26 +61,5 @@ class Vendor extends BaseModel
         $url = config('app.url') . "/email/verification?email=" . $this->email . "&queryUrl=" . urlencode($temporarySignedUrl);
 
         return $url;
-    }
-
-    /**
-     * Roll API Key
-     */
-    public function rollApiKey()
-    {
-       do {
-          $this->api_token = Str::random(60);
-       } while ($this->where('api_token', $this->api_token)->exists());
-
-       $this->save();
-    }
-
-    /**
-     * Remove API Key
-     */
-    public function removeApiKey()
-    {
-        $this->api_token = null;
-        $this->save();
     }
 }

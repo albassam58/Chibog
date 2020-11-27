@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Auth;
 
 class BaseModel extends Model
 {
@@ -23,7 +23,7 @@ class BaseModel extends Model
 	            $model->updated_by = $user->id;
 	        }
 
-            $user = auth('api')->user();
+            $user = auth('sanctum')->user();
 
             if ($user) {
                 $model->created_by = $user->id;
@@ -39,7 +39,7 @@ class BaseModel extends Model
             	$model->updated_by = $user->id;
             }
 
-            $user = auth('api')->user();
+            $user = auth('sanctum')->user();
 
             if ($user) {
                 $model->updated_by = $user->id;

@@ -38,7 +38,7 @@
                     </v-btn>
                 </v-badge>
                 <!-- <v-badge
-                    v-if="status.loggedIn"
+                    v-if="authenticated"
                     color="red"
                     content="6"
                     overlap
@@ -51,7 +51,7 @@
                     </v-btn>
                 </v-badge> -->
                 <v-menu
-                    v-if="status.loggedIn"
+                    v-if="authenticated"
                     left
                     bottom>
                     <template
@@ -126,13 +126,11 @@
             await vm.manageCarts();
 		},
 		computed: {
-			...mapState('currentUser', {
-                currentUser: state => state.user,
-				status: state => state.status
-			}),
-            ...mapState('orders', {
-                hasOrder: state => state.hasOrder,
-            })
+			...mapState({
+                currentUser: state => state.currentUser.user,
+                authenticated: state => state.currentUser.authenticated,
+                hasOrder: state => state.orders.hasOrder,
+			})
 		},
 		methods: {
 			...mapActions({
