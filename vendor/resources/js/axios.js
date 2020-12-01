@@ -44,8 +44,6 @@ request.interceptors.response.use(function (response) {
         return;
     }
 
-    console.log(error);
-
     return Promise.reject(error);
 });
 
