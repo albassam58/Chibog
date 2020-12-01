@@ -40,7 +40,7 @@ Route::group(['prefix' => 'v1/vendor'], function() {
 	Route::post('/login', [LoginController::class, 'login']);
 	Route::post('/register', [RegisterController::class, 'register']);
 
-	Route::get('/current', [VendorController::class, 'currentUser'])->middleware(['auth:sanctum', 'vendor_is_verified']);
+	Route::get('/current', [VendorController::class, 'currentUser'])->middleware(['auth:sanctum']);
 	Route::get('/tokens', [VendorController::class, 'tokens'])->middleware(['auth:sanctum', 'vendor_is_verified']);
 	Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
 
