@@ -223,16 +223,16 @@
                 orders: state => state.orders
     		}),
     		...mapState('regions', {
-    			regions: state => state.regions
+    			regions: state => state.regions.data
     		}),
     		...mapState('provinces', {
-    			provinces: state => state.provincesByRegion
+    			provinces: state => state.provincesByRegion.data
     		}),
     		...mapState('cities', {
-    			cities: state => state.citiesByProvince
+    			cities: state => state.citiesByProvince.data
     		}),
     		...mapState('barangays', {
-    			barangays: state => state.barangaysByProvinceCity
+    			barangays: state => state.barangaysByProvinceCity.data
     		}),
     	},
     	methods: {

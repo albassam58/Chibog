@@ -24,7 +24,7 @@
 				<v-divider class="my-4"></v-divider>
 				<v-row v-for="(items, index) in groupedItems" :key="index">
 					<v-col cols="12">
-						<div class="text-h6">{{ meals[index - 1] ? meals[index - 1].name : "" }}</div>
+						<div class="text-h6">{{ dishes[index - 1] ? dishes[index - 1].name : "" }}</div>
 						<v-simple-table>
 							<template v-slot:default>
 						      	<thead>
@@ -164,6 +164,12 @@
 		        	{ id: 2, name: 'Lunch' },
 		        	{ id: 3, name: 'Snack' },
 		        	{ id: 4, name: 'Dinner' },
+		        ],
+		        dishes: [
+		        	{ id: 1, name: 'Main Dish' },
+		        	{ id: 2, name: 'Appetizer' },
+		        	{ id: 3, name: 'Dessert' },
+		        	{ id: 4, name: 'Drinks' },
 		        ],
 	      		orderParams: {
 					filters: {
@@ -306,7 +312,7 @@
 				}
 
 				vm.groupedItems = _.groupBy(vm.items, function(object) {
-					return object.meal;
+					return object.dish;
 				});
 
 				for (let index in vm.groupedItems) {

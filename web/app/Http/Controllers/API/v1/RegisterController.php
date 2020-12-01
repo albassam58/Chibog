@@ -27,6 +27,8 @@ class RegisterController extends BaseController
 
 	        $userModel = new User;
 	        $createdUser = $userModel->addNew($create);
+
+	        return $this->sendResponse($createdUser);
 	    } catch (\Exception $error) {
 	    	return $this->sendError($error->getMessage());
 	    }
