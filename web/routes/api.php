@@ -28,7 +28,7 @@ use App\Http\Controllers\API\v1\StoreReviewController;
 |
 */
 
-Route::group(['prefix' => 'v1', 'middleware' => 'auth:api'], function() {
+Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function() {
 	Route::group(['prefix' => 'user'], function() {
 		Route::get('/current', [UserController::class, 'currentUser']);
 		Route::post('/logout', [LoginController::class, 'logout']);
@@ -70,6 +70,6 @@ Route::group(['prefix' => 'v1'], function() {
 });
 
 Route::group(['prefix' => 'v1/user'], function() {
-	Route::post('/login', [LoginController::class, 'authenticate']);
+	Route::post('/login', [LoginController::class, 'login']);
 	Route::post('/register', [RegisterController::class, 'register']);
 });

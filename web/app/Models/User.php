@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $appends = ['full_name', 'reversed_full_name'];
 
@@ -58,44 +59,12 @@ class User extends Authenticatable
         $check = null;
         if (array_key_exists('provider_id', $input)) {
             $check = static::where('provider_id', $input['provider_id'])->where('provider_name', $input['provider_name'])->first();
-            $api_token = null;
-            do {
-                $api_token = Str::random(60);
-            } while (static::where('api_token', $api_token)->exists());
-
-            $input['api_token'] = $api_token;
         }
 
         if(is_null($check)){
             return static::create($input);
-        } else {
-            $user = static::find($check->id);
-            $user->update([
-                'api_token' => $api_token
-            ]);
         }
 
-        return $user;
-    }
-
-    /**
-     * Roll API Key
-     */
-    public function rollApiKey()
-    {
-       do {
-          $this->api_token = Str::random(60);
-       } while ($this->where('api_token', $this->api_token)->exists());
-
-       $this->save();
-    }
-
-    /**
-     * Remove API Key
-     */
-    public function removeApiKey()
-    {
-        $this->api_token = null;
-        $this->save();
+        return $check;
     }
 }

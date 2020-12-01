@@ -8,7 +8,7 @@ use Auth;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Socialite;
-
+use Browser;
 
 class SocialiteController extends Controller
 {
@@ -76,10 +76,18 @@ class SocialiteController extends Controller
             $createdUser = $userModel->addNew($create);
             // Auth::loginUsingId($createdUser->id);
 
+            if (isset($request->device_name)) {
+                $device = $request->device_name;
+            } else {
+                $device = Browser::platformName();
+            }
+
+            $tokenResult = $createdUser->createToken($device ? $device : "Unknown")->plainTextToken;
+            
             // Create new view (I use callback.blade.php), and send the token and the name.
             return view('socialite-callback', [
                 'current_user' => $createdUser,
-                'api_token' => $createdUser->api_token,
+                'api_token' => $tokenResult,
                 'error' => null
             ]);
         } catch (Exception $e) {
