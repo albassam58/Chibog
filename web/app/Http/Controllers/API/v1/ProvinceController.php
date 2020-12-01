@@ -47,18 +47,24 @@ class ProvinceController extends BaseController
      */
     public function show($regionId)
     {
-        $jsonString = file_get_contents(base_path('resources/address/philippines.json'));
-        $data = json_decode($jsonString, true);
+        try {
+            $jsonString = file_get_contents(base_path('resources/address/philippines.json'));
+            $data = json_decode($jsonString, true);
 
-        $provinces = [];
-        foreach  ($data as $regionKey => $regionValue) {
-            foreach ($regionValue as $regionChildKey => $regionChildValue) {
-                if ($regionKey == $regionId) {
-                    if ($regionChildKey == "province_list") {
-                        return array_keys($regionChildValue);
+            $provinces = [];
+            foreach  ($data as $regionKey => $regionValue) {
+                foreach ($regionValue as $regionChildKey => $regionChildValue) {
+                    if ($regionKey == $regionId) {
+                        if ($regionChildKey == "province_list") {
+                            return $this->sendResponse(array_keys($regionChildValue));
+                        }
                     }
                 }
             }
+
+            return $this->sendResponse();
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
         }
     }
 

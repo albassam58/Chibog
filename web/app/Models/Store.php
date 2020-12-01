@@ -19,7 +19,7 @@ class Store extends Model
     protected $guarded = [];
 
     public function vendor() {
-    	return $this->belongsTo('App\Models\Vendor', 'vendor_id');
+    	return $this->belongsTo('App\Models\Vendor', 'vendor_id')->select(['id', 'first_name', 'last_name', 'mobile_number', 'email', 'region', 'province', 'city', 'barangay', 'street']);
     }
 
     public function reviews() {

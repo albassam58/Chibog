@@ -19,7 +19,7 @@ class CreateStoreReviewsTable extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->text('comment');
-            $table->tinyInteger('rate');
+            $table->smallInteger('rate');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();

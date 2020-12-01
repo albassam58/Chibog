@@ -48,23 +48,29 @@ class BarangayController extends BaseController
      */
     public function show($provinceName, $cityName)
     {
-        $jsonString = file_get_contents(base_path('resources/address/philippines.json'));
-        $data = json_decode($jsonString, true);
+        try {
+            $jsonString = file_get_contents(base_path('resources/address/philippines.json'));
+            $data = json_decode($jsonString, true);
 
-        foreach($data as $regionKey => $regionValue) {
-            foreach ($regionValue as $regionChildKey => $regionChildValue) {
-                if ($regionChildKey == "province_list") {
-                    foreach ($regionChildValue as $provinceKey => $provinceValue) {
-                        if ($provinceKey == $provinceName) {
-                            foreach ($provinceValue['municipality_list'] as $cityKey => $cityValue) {
-                                if ($cityKey == $cityName) {
-                                    return $cityValue['barangay_list'];
+            foreach($data as $regionKey => $regionValue) {
+                foreach ($regionValue as $regionChildKey => $regionChildValue) {
+                    if ($regionChildKey == "province_list") {
+                        foreach ($regionChildValue as $provinceKey => $provinceValue) {
+                            if ($provinceKey == $provinceName) {
+                                foreach ($provinceValue['municipality_list'] as $cityKey => $cityValue) {
+                                    if ($cityKey == $cityName) {
+                                        return $this->sendResponse($cityValue['barangay_list']);
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
+            return $this->sendResponse();
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
         }
     }
 

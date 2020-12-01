@@ -1,6 +1,7 @@
 const state = {
 	authenticated: false,
-	vendor: null
+	vendor: null,
+	tokens: []
 };
 const getters = {};
 const actions = {
@@ -14,6 +15,14 @@ const actions = {
 
 				commit('setVendor', data.data);
 			}
+		} catch (err) {
+			throw err;
+		}
+	},
+	async getVendorTokens({ commit }) {
+		try {
+			let { data } = await axios.get('/v1/vendor/tokens');
+			commit('setTokens', data.data);
 		} catch (err) {
 			throw err;
 		}
@@ -50,6 +59,9 @@ const mutations = {
 		state.vendor = vendor;
 		state.authenticated = true;
 	},
+	setTokens(state, tokens) {
+		state.tokens = tokens;
+	}
 };
 
 export default {

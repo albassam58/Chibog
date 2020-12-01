@@ -30,8 +30,8 @@ class CreateOrdersTable extends Migration
             $table->string('customer_street');
             $table->string('customer_mobile_number');
             $table->string('customer_email');
-            $table->tinyInteger('status')->comment('1. Pending; 2. Processing; 3. For Delivery; 4. Delivered');
-            $table->tinyInteger('rated')->default('0')->comment('0. If not rated; 1. If rated')->nullable();
+            $table->smallInteger('status')->comment('1. Pending; 2. Processing; 3. For Delivery; 4. Delivered');
+            $table->smallInteger('rated')->default('0')->comment('0. If not rated; 1. If rated')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
