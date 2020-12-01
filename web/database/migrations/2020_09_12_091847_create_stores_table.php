@@ -29,7 +29,7 @@ class CreateStoresTable extends Migration
             $table->time('schedule_time_in')->nullable();
             $table->time('schedule_time_out')->nullable();
             $table->double('rate', 12, 2)->nullable();
-            $table->tinyInteger('status')->nullable();
+            $table->smallInteger('status')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();

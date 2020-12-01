@@ -20,10 +20,10 @@ class CreateItemsTable extends Migration
             $table->text('description');
             $table->unsignedBigInteger('food_type_id');
             $table->unsignedBigInteger('cuisine_id');
-            $table->tinyInteger('meal')->comment('1. Breakfast; 2. Lunch; 3. Snack; 4. Dinner');
+            $table->smallInteger('meal')->comment('1. Breakfast; 2. Lunch; 3. Snack; 4. Dinner');
             $table->double('amount', 12, 2);
             $table->double('discount', 12, 2)->nullable();
-            $table->tinyInteger('status')->nullable();
+            $table->smallInteger('status')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();

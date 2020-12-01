@@ -9,10 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Browser;
 
 class LoginController extends BaseController
 {
-	public function authenticate(Request $request)
+	public function login(Request $request)
 	{
 		$request->validate([
 			'email' => 'required|email',
@@ -22,23 +23,34 @@ class LoginController extends BaseController
 		try {
 			$user = User::where('email', $request->email)->firstOrFail();
 
-			if (Hash::check($request->password, $user->password)) {
-				$user->rollApiKey(); // Model Function
-				return $this->sendResponse($user);
+			if (!Hash::check($request->password, $user->password)) {
+				throw new \Exception('Invalid email or password');
 			}
 
-			throw new ModelNotFoundException('Invalid email or password');
-		} catch (ModelNotFoundException $error) {
+			if (isset($request->device_name)) {
+				$device = $request->device_name;
+			} else {
+				$device = Browser::platformName();
+			}
+
+			$tokenResult = $user->createToken($device ? $device : "Unknown")->plainTextToken;
+			
+			return $this->sendResponse($tokenResult);
+		} catch (ModelNotFoundException $e) {
 			return $this->sendError("Invalid email or password", [], 401);
-		} catch(\Exception $error) {
-			return $this->sendError($error->getMessage());
+		} catch(\Exception $e) {
+			return $this->sendError($e->getMessage());
 		}
 	}
 
 	public function logout(Request $request)
 	{
-		// return $request->user();
-		$request->user()->removeApiKey();
-		// User::find(Auth::user())
+		try {
+			// Revoke the user's current token...
+			$request->user()->currentAccessToken()->delete();
+			return $this->sendResponse();
+		} catch (\Exception $e) {
+			return $this->sendError($e->getMessage());
+		}
 	}
 }

@@ -17,7 +17,7 @@ class VendorIsVerified
      */
     public function handle($request, Closure $next)
     {
-        $vendor = auth('api')->user();
+        $vendor = auth('sanctum')->user();
 
         if ($vendor->email_verified_at) {
             return $next($request);

@@ -29,24 +29,24 @@ class OrderController extends BaseController
      */
     public function index(Request $request)
     {
-        try {
-            $search = [ "query" => "", "columns" => [] ];
-            $filters = $request->filters;
+        // try {
+        //     $search = [ "query" => "", "columns" => [] ];
+        //     $filters = $request->filters;
 
-            $query = new Order();
-            $query = $query->with(['item', 'store']);
+        //     $query = new Order();
+        //     $query = $query->with(['item', 'store']);
 
-            // if filtered by status = 1 (Cart), don't paginate
-            $paginate = true;
-            $filter = json_decode($filters);
-            if (isset($filter->status) && $filter->status == 1) $paginate = false;
+        //     // if filtered by status = 1 (Cart), don't paginate
+        //     $paginate = true;
+        //     $filter = json_decode($filters);
+        //     if (isset($filter->status) && $filter->status == 1) $paginate = false;
 
-            $orders = $this->applySearch($query, $search, $filters, $paginate);
+        //     $orders = $this->applySearch($query, $search, $filters, $paginate);
 
-            return $this->sendResponse($orders);
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
+        //     return $this->sendResponse($orders);
+        // } catch (\Exception $e) {
+        //     return $this->sendError($e->getMessage());
+        // }
     }
 
     /**
@@ -124,46 +124,46 @@ class OrderController extends BaseController
      */
     public function store(Request $request)
     {
-        try {
-            DB::beginTransaction();
+        // try {
+        //     DB::beginTransaction();
 
-            $form = $request->form;
-            $item = $request->item;
+        //     $form = $request->form;
+        //     $item = $request->item;
 
-            $order = Order::create([
-                'transaction_id'            => "",
-                'store_id'                  => $item->store_id,
-                'item_id'                   => $item->id,
-                'amount'                    => $item->amount,
-                'quantity'                  => $item->quantity,
-                'special_instruction'       => $item->special_instruction,
-                'customer_first_name'       => $form['customer_first_name'],
-                'customer_last_name'        => $form['customer_last_name'],
-                'customer_region'           => $form['customer_region'],
-                'customer_province'         => $form['customer_province'],
-                'customer_city'             => $form['customer_city'],
-                'customer_barangay'         => $form['customer_barangay'],
-                'customer_street'           => $form['customer_street'],
-                'customer_mobile_number'    => $form['customer_mobile_number'],
-                'customer_email'            => $form['customer_email'],
-                'status'                    => $form['status']
-            ]);
+        //     $order = Order::create([
+        //         'transaction_id'            => "",
+        //         'store_id'                  => $item->store_id,
+        //         'item_id'                   => $item->id,
+        //         'amount'                    => $item->amount,
+        //         'quantity'                  => $item->quantity,
+        //         'special_instruction'       => $item->special_instruction,
+        //         'customer_first_name'       => $form['customer_first_name'],
+        //         'customer_last_name'        => $form['customer_last_name'],
+        //         'customer_region'           => $form['customer_region'],
+        //         'customer_province'         => $form['customer_province'],
+        //         'customer_city'             => $form['customer_city'],
+        //         'customer_barangay'         => $form['customer_barangay'],
+        //         'customer_street'           => $form['customer_street'],
+        //         'customer_mobile_number'    => $form['customer_mobile_number'],
+        //         'customer_email'            => $form['customer_email'],
+        //         'status'                    => $form['status']
+        //     ]);
 
-            // make the transaction_id
-            $transactionId = "CH" . $order->id . $order->store_id . time();
-            $order->transaction_id = $transactionId;
-            $order->save();
+        //     // make the transaction_id
+        //     $transactionId = "CH" . $order->id . $order->store_id . time();
+        //     $order->transaction_id = $transactionId;
+        //     $order->save();
 
-            // add store relationship
-            $order->store = $item->store;
+        //     // add store relationship
+        //     $order->store = $item->store;
 
-            DB::commit();
+        //     DB::commit();
 
-            return $this->sendResponse($order);
-        } catch(\Exception $e) {
-            DB::rollBack();
-            return $this->sendError($e->getMessage());
-        }
+        //     return $this->sendResponse($order);
+        // } catch(\Exception $e) {
+        //     DB::rollBack();
+        //     return $this->sendError($e->getMessage());
+        // }
     }
 
     /**
@@ -292,86 +292,86 @@ class OrderController extends BaseController
      */
     public function update(Request $request, Order $order)
     {
-        try {
-            DB::beginTransaction();
+        // try {
+        //     DB::beginTransaction();
 
-            $form = $request->form;
-            $item = $request->item;
+        //     $form = $request->form;
+        //     $item = $request->item;
 
-            $order->update([
-                'store_id'                  => $item['store_id'],
-                'item_id'                   => $item['item_id'],
-                'amount'                    => $item['amount'],
-                'quantity'                  => $item['quantity'],
-                'special_instruction'       => $item['special_instruction'],
-                'customer_first_name'       => $form['customer_first_name'],
-                'customer_last_name'        => $form['customer_last_name'],
-                'customer_region'           => $form['customer_region'],
-                'customer_province'         => $form['customer_province'],
-                'customer_city'             => $form['customer_city'],
-                'customer_barangay'         => $form['customer_barangay'],
-                'customer_street'           => $form['customer_street'],
-                'customer_mobile_number'    => $form['customer_mobile_number'],
-                'customer_email'            => $form['customer_email'],
-                'status'                    => $form['status']
-            ]);
+        //     $order->update([
+        //         'store_id'                  => $item['store_id'],
+        //         'item_id'                   => $item['item_id'],
+        //         'amount'                    => $item['amount'],
+        //         'quantity'                  => $item['quantity'],
+        //         'special_instruction'       => $item['special_instruction'],
+        //         'customer_first_name'       => $form['customer_first_name'],
+        //         'customer_last_name'        => $form['customer_last_name'],
+        //         'customer_region'           => $form['customer_region'],
+        //         'customer_province'         => $form['customer_province'],
+        //         'customer_city'             => $form['customer_city'],
+        //         'customer_barangay'         => $form['customer_barangay'],
+        //         'customer_street'           => $form['customer_street'],
+        //         'customer_mobile_number'    => $form['customer_mobile_number'],
+        //         'customer_email'            => $form['customer_email'],
+        //         'status'                    => $form['status']
+        //     ]);
 
-            DB::commit();
+        //     DB::commit();
 
-            return $this->sendResponse($order);
-        } catch(\Exception $e) {
-            DB::rollBack();
-            return $this->sendError($e->getMessage());
-        }
+        //     return $this->sendResponse($order);
+        // } catch(\Exception $e) {
+        //     DB::rollBack();
+        //     return $this->sendError($e->getMessage());
+        // }
     }
 
     public function updateByStore(Request $request)
     {
-        try {
-            DB::beginTransaction();
+        // try {
+        //     DB::beginTransaction();
 
-            $form = $request->form;
-            $items = $request->items;
+        //     $form = $request->form;
+        //     $items = $request->items;
 
-            $response = [];
+        //     $response = [];
 
-            foreach ($items as $item) {
-                $order = Order::find($item['id']);
+        //     foreach ($items as $item) {
+        //         $order = Order::find($item['id']);
                 
-                if ($form['status'] == 2 && $item['quantity'] <= 0) {
-                    // delete if status is pending (2) and quantity = 0
-                    $order->delete();
-                } else {
-                    // update
-                    $order->update([
-                        'store_id'                  => $item['store_id'],
-                        'item_id'                   => $item['item_id'],
-                        'amount'                    => $item['amount'],
-                        'quantity'                  => $item['quantity'],
-                        'special_instruction'       => $item['special_instruction'],
-                        'customer_first_name'       => $form['customer_first_name'],
-                        'customer_last_name'        => $form['customer_last_name'],
-                        'customer_region'           => $form['customer_region'],
-                        'customer_province'         => $form['customer_province'],
-                        'customer_city'             => $form['customer_city'],
-                        'customer_barangay'         => $form['customer_barangay'],
-                        'customer_street'           => $form['customer_street'],
-                        'customer_mobile_number'    => $form['customer_mobile_number'],
-                        'customer_email'            => $form['customer_email'],
-                        'status'                    => $form['status']
-                    ]);
+        //         if ($form['status'] == 2 && $item['quantity'] <= 0) {
+        //             // delete if status is pending (2) and quantity = 0
+        //             $order->delete();
+        //         } else {
+        //             // update
+        //             $order->update([
+        //                 'store_id'                  => $item['store_id'],
+        //                 'item_id'                   => $item['item_id'],
+        //                 'amount'                    => $item['amount'],
+        //                 'quantity'                  => $item['quantity'],
+        //                 'special_instruction'       => $item['special_instruction'],
+        //                 'customer_first_name'       => $form['customer_first_name'],
+        //                 'customer_last_name'        => $form['customer_last_name'],
+        //                 'customer_region'           => $form['customer_region'],
+        //                 'customer_province'         => $form['customer_province'],
+        //                 'customer_city'             => $form['customer_city'],
+        //                 'customer_barangay'         => $form['customer_barangay'],
+        //                 'customer_street'           => $form['customer_street'],
+        //                 'customer_mobile_number'    => $form['customer_mobile_number'],
+        //                 'customer_email'            => $form['customer_email'],
+        //                 'status'                    => $form['status']
+        //             ]);
 
-                    array_push($response, $order);
-                }
-            }
+        //             array_push($response, $order);
+        //         }
+        //     }
 
-            DB::commit();
+        //     DB::commit();
 
-            return $this->sendResponse($response);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->sendError($e->getMessage());
-        }
+        //     return $this->sendResponse($response);
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return $this->sendError($e->getMessage());
+        // }
     }
 
     /**
@@ -386,11 +386,12 @@ class OrderController extends BaseController
             $transactionId = $request->transactionId;
             $status = $request->status;
 
-            Order::where('transaction_id', $transactionId)->update([
+            $order = Order::where('transaction_id', $transactionId)->firstOrFail();
+            $order->update([
                 'status' => $status
             ]);
 
-            return $this->sendResponse();
+            return $this->sendResponse($order);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }
@@ -404,8 +405,8 @@ class OrderController extends BaseController
      */
     public function destroy(Order $order)
     {
-        $order->delete();
-        return $this->sendResponse([]);
+        // $order->delete();
+        // return $this->sendResponse([]);
     }
 
     /**
@@ -416,11 +417,11 @@ class OrderController extends BaseController
      */
     public function destroyByStore(Request $request)
     {
-        try {
-            Order::whereIn('id', $request->id)->delete();
-            return $this->sendResponse();
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
+        // try {
+        //     Order::whereIn('id', $request->id)->delete();
+        //     return $this->sendResponse();
+        // } catch (\Exception $e) {
+        //     return $this->sendError($e->getMessage());
+        // }
     }
 }

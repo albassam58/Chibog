@@ -9,8 +9,8 @@
         >
             <template v-slot:activator="{ on, attrs }">
                 <v-badge
-                    :color="totalUnread > 0 ? 'red' : ''"
-                    :content="totalUnread"
+                    :color="badgeCount > 0 ? 'red' : ''"
+                    :content="badgeCount"
                     overlap
                     offset-x="24"
                     offset-y="25"
@@ -26,8 +26,8 @@
                 </v-badge>
             </template>
 
-            <v-card width="400" v-if="popupNotifications.length">
-                <v-list v-for="(notification, index) in popupNotifications" :key="notification.id">
+            <v-card width="400" v-if="notifications.length">
+                <v-list v-for="(notification, index) in notifications" :key="notification.id">
                     <v-list-item @click="read(notification.id)">
                         <v-list-item-content :class="notification.status == 1 ? 'font-weight-bold' : ''">
                             <v-list-item-title>
@@ -65,13 +65,18 @@
 
     export default {
         data: () => ({
-            menu: false
+            menu: false,
+            badgeCount: 0,
+            notifications: [],
         }),
         async created() {
             let vm = this;
 
             await vm.fetchVendorPopup();
             await vm.countUnread();
+
+            vm.badgeCount = vm.totalUnread;
+            vm.notifications = vm.popupNotifications;
         },
         computed: {
             ...mapState('orderNotifications', {
@@ -125,6 +130,16 @@
                 }
 
                 vm.notifications.unshift(data);
+            }
+        },
+        watch: {
+            totalUnread(newVal) {
+                let vm = this;
+                vm.badgeCount = newVal;
+            },
+            popupNotifications(newVal) {
+                let vm = this;
+                vm.notifications = newVal;
             }
         }
     }

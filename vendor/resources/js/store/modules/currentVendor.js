@@ -1,14 +1,9 @@
 const state = {
-	vendor: {},
-	status: {
-		loggedIn: false
-	}
+	authenticated: false,
+	vendor: null,
+	tokens: []
 };
-const getters = {
-	isAuthenticated: state => {
-		return state.status.loggedIn;
-	}
-};
+const getters = {};
 const actions = {
 	async getVendor({ commit }) {
 		try {
@@ -16,21 +11,27 @@ const actions = {
 			if (localStorage.getItem('api_token')) {
 				let { data } = await axios.get('/v1/vendor/current');
 
+				localStorage.setItem('current_vendor', JSON.stringify(data.data));
+
 				commit('setVendor', data.data);
 			}
 		} catch (err) {
 			throw err;
 		}
 	},
-	async loginVendor({commit}, vendor) {
+	async getVendorTokens({ commit }) {
 		try {
-			let { data } = await axios.post('/v1/vendor/login', {
-				email: vendor.email,
-				password: vendor.password
-			});
+			let { data } = await axios.get('/v1/vendor/tokens');
+			commit('setTokens', data.data);
+		} catch (err) {
+			throw err;
+		}
+	},
+	async loginVendor({commit}, credentials) {
+		try {
+			let { data } = await axios.post('/v1/vendor/login', credentials);
 
-			localStorage.setItem('api_token', `Bearer ${ data.data.api_token }`);
-			localStorage.setItem('current_vendor', JSON.stringify(data.data));
+			localStorage.setItem('api_token', `Bearer ${ data.data }`);
 		} catch (err) {
 			throw err;
 		}
@@ -48,12 +49,6 @@ const actions = {
 
 			localStorage.removeItem('api_token');
 			localStorage.removeItem('current_vendor');
-
-			state.status = {
-				loggedIn: false
-			}
-
-			state.vendor = {};
 		} catch (err) {
 			throw err;
 		}
@@ -62,8 +57,11 @@ const actions = {
 const mutations = {
 	setVendor(state, vendor) {
 		state.vendor = vendor;
-		state.status.loggedIn = true;
+		state.authenticated = true;
 	},
+	setTokens(state, tokens) {
+		state.tokens = tokens;
+	}
 };
 
 export default {

@@ -11,6 +11,44 @@ class Item extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['dishValue'];
+
+    public function getDishValueAttribute() {
+        switch ($this->dish) {
+            case 1:
+                return [
+                    "id" => 1,
+                    "name" => "Main Dish"
+                ];
+                break;
+            case 2:
+                return [
+                    "id" => 2,
+                    "name" => "Appetizer"
+                ];
+                break;
+            case 3:
+                return [
+                    "id" => 3,
+                    "name" => "Dessert"
+                ];
+                break;
+            case 4:
+                return [
+                    "id" => 4,
+                    "name" => "Drinks"
+                ];
+                break;
+            
+            default:
+                return [
+                    "id" => null,
+                    "name" => ""
+                ];
+                break;
+        };
+    }
+
     public function getStatusAttribute($value) {
     	switch ($value) {
     		case 1:

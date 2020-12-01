@@ -28,7 +28,12 @@ use App\Http\Controllers\API\v1\StoreReviewController;
 |
 */
 
-Route::group(['prefix' => 'v1', 'middleware' => 'auth:api'], function() {
+Route::group(['prefix' => 'v1/user'], function() {
+	Route::post('/login', [LoginController::class, 'login']);
+	Route::post('/register', [RegisterController::class, 'register']);
+});
+
+Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function() {
 	Route::group(['prefix' => 'user'], function() {
 		Route::get('/current', [UserController::class, 'currentUser']);
 		Route::post('/logout', [LoginController::class, 'logout']);
@@ -58,18 +63,13 @@ Route::group(['prefix' => 'v1'], function() {
 	Route::get('/barangays/{provinceName}/{cityName}', [BarangayController::class, 'show']);
 
 	// Orders
-	Route::get('/orders/check', [OrderController::class, 'check']);
+	// Route::get('/orders/check', [OrderController::class, 'check']);
 	Route::get('/orders/search/{query}', [OrderController::class, 'search']);
 	Route::put('/orders/update/status', [OrderController::class, 'updateStatus']);
 	Route::post('/orders/store', [OrderController::class, 'storeByStore']);
-	Route::put('/orders/store', [OrderController::class, 'updateByStore']);
-	Route::delete('/orders/store', [OrderController::class, 'destroyByStore']);
+	// Route::put('/orders/store', [OrderController::class, 'updateByStore']);
+	// Route::delete('/orders/store', [OrderController::class, 'destroyByStore']);
 	Route::apiResource('orders', OrderController::class);
 
 	Route::apiResource('store-reviews', StoreReviewController::class);
-});
-
-Route::group(['prefix' => 'v1/user'], function() {
-	Route::post('/login', [LoginController::class, 'authenticate']);
-	Route::post('/register', [RegisterController::class, 'register']);
 });

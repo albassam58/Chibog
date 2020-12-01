@@ -15,22 +15,26 @@ class RegionController extends BaseController
      */
     public function index()
     {
-        $jsonString = file_get_contents(base_path('resources/address/philippines.json'));
-        $data = json_decode($jsonString, true);
+        try {
+            $jsonString = file_get_contents(base_path('resources/address/philippines.json'));
+            $data = json_decode($jsonString, true);
 
-        $regions = [];
-        foreach  ($data as $regionKey => $regionValue) {
-            foreach ($regionValue as $regionChildKey => $regionChildValue) {
-                if ($regionChildKey == "region_name") {
-                    array_push($regions, [
-                        "id"    => $regionKey,
-                        "name"  => $regionChildValue
-                    ]);
+            $regions = [];
+            foreach  ($data as $regionKey => $regionValue) {
+                foreach ($regionValue as $regionChildKey => $regionChildValue) {
+                    if ($regionChildKey == "region_name") {
+                        array_push($regions, [
+                            "id"    => $regionKey,
+                            "name"  => $regionChildValue
+                        ]);
+                    }
                 }
             }
-        }
 
-        return $regions;
+            return $this->sendResponse($regions);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 
     /**

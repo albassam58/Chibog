@@ -30,10 +30,6 @@ use App\Http\Controllers\API\v1\OrderNotificationController;
 */
 
 Route::group(['prefix' => 'v1'], function() {
-	// email verification vendor
-	Route::get('/vendor/verify/{id}', [VendorController::class, 'verify'])->name('vendor.verify')->middleware('signed');
-	Route::get('/vendor/resend/{id}/{email}', [VendorController::class, 'resend'])->name('vendor.resend');
-
 	Route::apiResource('regions', RegionController::class);
 	Route::apiResource('provinces', ProvinceController::class);
 	Route::apiResource('cities', CityController::class);
@@ -41,14 +37,19 @@ Route::group(['prefix' => 'v1'], function() {
 });
 
 Route::group(['prefix' => 'v1/vendor'], function() {
-	Route::post('/login', [LoginController::class, 'authenticate']);
+	Route::post('/login', [LoginController::class, 'login']);
 	Route::post('/register', [RegisterController::class, 'register']);
 
-	Route::get('/current', [VendorController::class, 'currentUser'])->middleware(['auth:api', 'vendor_is_verified']);
-	Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:api');
+	Route::get('/current', [VendorController::class, 'currentUser'])->middleware(['auth:sanctum', 'vendor_is_verified']);
+	Route::get('/tokens', [VendorController::class, 'tokens'])->middleware(['auth:sanctum', 'vendor_is_verified']);
+	Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
+
+	// email verification vendor
+	Route::get('/verify/{id}', [VendorController::class, 'verify'])->name('vendor.verify')->middleware('signed');
+	Route::get('/resend/{id}/{email}', [VendorController::class, 'resend'])->name('vendor.resend');
 });
 
-Route::group(['prefix' => 'v1', 'middleware' => ['auth:api', 'vendor_is_verified']], function() {
+Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum', 'vendor_is_verified']], function() {
 
 	// stores
 	Route::get('/stores/vendor', [StoreController::class, 'vendor']);

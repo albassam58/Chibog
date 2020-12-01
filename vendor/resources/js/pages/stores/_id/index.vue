@@ -57,7 +57,7 @@
 			      		required
 			    	></v-textarea>
 
-			    	<v-select
+			    	<!-- <v-select
 			      		v-model="form.cuisine_id"
 			      		:items="cuisines"
 			      		:rules="rules"
@@ -84,6 +84,16 @@
 			      		item-value="id"
 			      		item-text="name"
 			      		label="Food Type"
+			      		required
+			    	></v-select> -->
+
+			    	<v-select
+			      		v-model="form.dish"
+			      		:items="dishes"
+			      		:rules="rules"
+			      		item-value="id"
+			      		item-text="name"
+			      		label="Type of Dish"
 			      		required
 			    	></v-select>
 
@@ -113,9 +123,9 @@
 		        <tr>
 		          <th class="text-left">Name</th>
 		          <th class="text-left">Description</th>
-		          <th class="text-left">Food Type</th>
-		          <th class="text-left">Cuisine</th>
-		          <th class="text-left">Meal</th>
+		          <th class="text-left">Type of Dish</th>
+		          <!-- <th class="text-left">Cuisine</th>
+		          <th class="text-left">Meal</th> -->
 		          <th class="text-left">Amount</th>
 		          <th class="text-left">Status</th>
 		          <th class="text-center"></th>
@@ -128,9 +138,9 @@
 		        >
 		          <td>{{ item.name }}</td>
 		          <td>{{ item.description }}</td>
-		          <td>{{ item.food_type ? item.food_type.name : null }}</td>
-		          <td>{{ item.cuisine ? item.cuisine.name : null }}</td>
-		          <td>{{ findMeal(item) }}</td>
+		          <td>{{ item.dishValue.name }}</td>
+		          <!-- <td>{{ item.cuisine ? item.cuisine.name : null }}</td>
+		          <td>{{ findMeal(item) }}</td> -->
 		          <td>{{ item.amount.toFixed(2) }}</td>
 		          <td>{{ item.status.name }}</td>
 		          <td class="text-center">
@@ -178,7 +188,7 @@
 				      		required
 				    	></v-textarea>
 
-				    	<v-select
+				    	<!-- <v-select
 				      		v-model="editForm.cuisine_id"
 				      		:items="cuisines"
 				      		:rules="rules"
@@ -196,15 +206,25 @@
 				      		item-text="name"
 				      		label="Meal"
 				      		required
-				    	></v-select>
+				    	></v-select> -->
 
-				    	<v-select
+				    	<!-- <v-select
 				      		v-model="editForm.food_type_id"
 				      		:items="foodTypes"
 				      		:rules="rules"
 				      		item-value="id"
 				      		item-text="name"
 				      		label="Food Type"
+				      		required
+				    	></v-select> -->
+
+				    	<v-select
+				      		v-model="editForm.dish"
+				      		:items="dishes"
+				      		:rules="rules"
+				      		item-value="id"
+				      		item-text="name"
+				      		label="Type of Dish"
 				      		required
 				    	></v-select>
 
@@ -274,6 +294,12 @@
 	        	{ id: 3, name: 'Snack' },
 	        	{ id: 4, name: 'Dinner' },
 	        ],
+	        dishes: [
+	        	{ id: 1, name: 'Main Dish' },
+	        	{ id: 2, name: 'Appetizer' },
+	        	{ id: 3, name: 'Dessert' },
+	        	{ id: 4, name: 'Drinks' },
+	        ],
 	        status: [
 	        	{ id: 4, name: 'Available' },
 	        	{ id: 5, name: 'Not Available' }
@@ -325,6 +351,7 @@
 					description: item.description,
 					cuisine_id: item.cuisine_id,
 					meal: item.meal,
+					dish: item.dish,
 					food_type_id: item.food_type_id,
 					amount: item.amount,
 					status: item.status.id

@@ -30,7 +30,7 @@ class CreateVendorsTable extends Migration
             $table->string('provider_name')->nullable();
             $table->string('provider_id')->nullable();
             $table->string('api_token')->nullable();
-            $table->unsignedTinyInteger('status')->nullable();
+            $table->unsignedSmallInteger('status')->nullable();
             $table->rememberToken();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();

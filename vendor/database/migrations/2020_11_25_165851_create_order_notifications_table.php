@@ -18,7 +18,7 @@ class CreateOrderNotificationsTable extends Migration
             $table->string('channel');
             $table->text('message');
             $table->text('payload');
-            $table->tinyInteger('status')->comment('1. Not yet read; 2. Read;');
+            $table->smallInteger('status')->comment('1. Not yet read; 2. Read;');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
