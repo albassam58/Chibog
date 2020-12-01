@@ -15,7 +15,7 @@
                     </router-link>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <div v-if="authenticated">
+                <div v-if="authenticated && vendor.email_verified_at">
                     <order-notification ref="orderNotificationRef"></order-notification>
                 </div>
                 <div>
@@ -136,6 +136,13 @@
             let darkMode = localStorage.getItem('darkMode');
 
 			await vm.getVendor();
+
+            // check if email is verified, if not, redirect to email verification
+            if (vm.vendor && !vm.vendor.email_verified_at) {
+                if (vm.$route.path != '/email/verification') {
+                    vm.$router.push('/email/verification');
+                }
+            }
 
             // set dark mode
             vm.$vuetify.theme.dark = darkMode === 'true' ? true : false;
