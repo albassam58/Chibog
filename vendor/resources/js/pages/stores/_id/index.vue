@@ -7,7 +7,6 @@
 </route>
 <template>
 	<v-container>
-
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
 				<div class="text-h4 mb-4">View Store</div>
@@ -105,6 +104,16 @@
 			      		required
 			    	></v-text-field>
 
+			    	<v-select
+			      		v-model="form.status"
+			      		:items="status"
+			      		:rules="rules"
+			      		item-value="id"
+			      		item-text="name"
+			      		label="Status"
+			      		required
+			    	></v-select>
+
 			    	<v-btn
 			      		:disabled="!valid"
 			      		color="success"
@@ -166,7 +175,7 @@
 	    >
 	      	<v-card>
 	        	<v-card-title>
-	          		Add Item
+	          		Edit Item
 	        	</v-card-title>
 
 	        	<v-card-text class="my-4 text-body-1">

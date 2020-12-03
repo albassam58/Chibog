@@ -12,8 +12,6 @@ const router = new Router({
     base: "/"
 });
 
-export default router;
-
 router.beforeResolve( ( to, from, next ) => {
 	// check if correct parameters and not root
 	if (!to.matched.length && to.path !== "/") {
@@ -21,17 +19,12 @@ router.beforeResolve( ( to, from, next ) => {
 		return;
 	}
 
-	let vendor = JSON.parse(localStorage.getItem('current_vendor'));
-
 	// if requires auth but no token return access error
-	if (_.has(to.meta, 'requiresAuth') && !localStorage.getItem('api_token')) {
+	if (_.has(to.meta, 'requiresAuth') && !localStorage.getItem('authenticated')) {
 		next({ name: 'login' });
 		return;
-	} else if ((to.name == 'login' || to.name == 'register') && localStorage.getItem('api_token')) {
+	} else if ((to.name == 'login' || to.name == 'register') && localStorage.getItem('authenticated')) {
 		next({ path: "/" });
-		return;
-	} else if (to.name !== 'email-verification' && vendor && !vendor.email_verified_at) {
-		next({ name: 'email-verification' });
 		return;
 	}
 
@@ -49,3 +42,5 @@ router.beforeResolve( ( to, from, next ) => {
 
 	next();
 });
+
+export default router;
