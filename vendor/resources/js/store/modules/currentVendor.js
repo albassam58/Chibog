@@ -7,12 +7,8 @@ const getters = {};
 const actions = {
 	async getVendor({ commit }) {
 		try {
-			// if there is api_token get the logged in vendor
-			if (localStorage.getItem('api_token')) {
+			if (localStorage.getItem('authenticated')) {
 				let { data } = await axios.get('/v1/vendor/current');
-
-				localStorage.setItem('current_vendor', JSON.stringify(data.data));
-
 				commit('setVendor', data.data);
 			}
 		} catch (err) {
@@ -29,9 +25,9 @@ const actions = {
 	},
 	async loginVendor({commit}, credentials) {
 		try {
-			let { data } = await axios.post('/v1/vendor/login', credentials);
-
-			localStorage.setItem('api_token', `Bearer ${ data.data }`);
+			axios.defaults.baseURL = '/';
+			await axios.post('/login', credentials);
+			localStorage.setItem('authenticated', true);
 		} catch (err) {
 			throw err;
 		}
@@ -45,10 +41,24 @@ const actions = {
 	},
 	async logoutVendor() {
 		try {
-			await axios.post('/v1/vendor/logout');
-
-			localStorage.removeItem('api_token');
-			localStorage.removeItem('current_vendor');
+			axios.defaults.baseURL = '/';
+			await axios.post('/logout');
+			localStorage.setItem('authenticated', false);
+		} catch (err) {
+			throw err;
+		}
+	},
+	async logoutDevice({ commit }, id) {
+		try {
+			await axios.post(`/v1/vendor/logout/device/${ id }`);
+		} catch (err) {
+			throw err;
+		}
+	},
+	// logout all devices except current access
+	async logoutAll({ commit }) {
+		try {
+			await axios.post(`/v1/vendor/logout/all`);
 		} catch (err) {
 			throw err;
 		}

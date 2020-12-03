@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Auth\FacebookController;
+use App\Http\Controllers\Auth\AuthenticateController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -15,46 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/artisan-migrate', function() {
-	try {
-        \Artisan::call('migrate', [
-            '--force' => true
-        ]);
-        return "Success";
-        // \Artisan::call('migrate --path=database/migrations/jobs');
-        // \Artisan::call('migrate --path=database/migrations/webhooks');
-        // \Artisan::call('migrate --path=database/migrations/purls');
-    } catch (\Exception $e) {
-        return $e->getMessage();
-    }
-});
-
-Route::get('/artisan-seed', function() {
-    try {
-        // \Artisan::call('composer dump-autoload');
-        return \Artisan::call('db:seed', [
-            '--force' => true
-        ]);
-
-        return 'Success';
-    } catch (\Exception $e) {
-        return $e->getMessage();
-    }
-});
-
-Route::group(['prefix' => 'auth'], function() {
-	Route::get('user', function() {
-		return Auth::user();
-	});
-
-	Route::get('facebook', [FacebookController::class, 'redirectToFacebook']);
-	Route::get('facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
-
-	Route::get('logout', function() {
-		Auth::logout();
-		return redirect('/');
-	});
-});
+Route::post('/login', [AuthenticateController::class, 'login']);
+Route::post('/logout', [AuthenticateController::class, 'logout']);
 
 Route::get('/{vue}', function() {
 	return view('spa');

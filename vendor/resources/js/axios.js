@@ -1,19 +1,21 @@
 import axios from 'axios'
 
-let headers = {
-    'X-Requested-With': 'XMLHttpRequest',
-    'cache-control': 'no-cache'
-};
+// let headers = {
+//     'X-Requested-With': 'XMLHttpRequest',
+//     'cache-control': 'no-cache'
+// };
 
-let accessToken = localStorage.getItem('api_token');
+// let accessToken = localStorage.getItem('api_token');
 
-if (accessToken && accessToken !== '') {
-    headers.Authorization = accessToken;
-};
+// if (accessToken && accessToken !== '') {
+//     headers.Authorization = accessToken;
+// };
+
+axios.defaults.withCredentials = true;
 
 const request = axios.create({
     baseURL: "/api",
-    headers: headers
+    // headers: headers
 });
 
 // Add a request interceptor
@@ -37,8 +39,8 @@ request.interceptors.response.use(function (response) {
     // unauthorized
     if (error.response.status == 401) {
         // logout user
-        localStorage.removeItem('api_token');
-        localStorage.removeItem('current_vendor');
+        localStorage.removeItem('authenticated');
+        // localStorage.removeItem('current_vendor');
         window.location.href = "/";
 
         return;

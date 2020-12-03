@@ -238,6 +238,22 @@
 								dark
 								@click="openUpdateStatusDialog(order.transaction_id, 6)"
 							>Cancel</v-btn>
+							<v-chip
+								v-if="order.is_paid"
+								class="ml-2 text-xl"
+								color="green"
+								dark
+								label
+							>
+								Paid
+								<v-icon right>mdi-check</v-icon>
+							</v-chip>
+							<v-btn
+								v-else
+								color="error"
+								dark
+								@click="openUpdatePaidDialog(order.transaction_id)"
+							>Paid</v-btn>
 							<v-spacer />
 							<v-btn
 								v-if="order.status.id == 2"
@@ -297,6 +313,38 @@
 		            		:disabled="updateStatusDialogDisable"
 		            		@click="updateOrderStatus"
 		          		>Update</v-btn>
+		        	</v-card-actions>
+		      	</v-card>
+		    </v-dialog>
+
+		    <v-dialog
+		      v-model="updatePaidDialog"
+		      width="500"
+		    >
+		      	<v-card>
+		        	<v-card-title>
+		          		Already Paid?
+		        	</v-card-title>
+
+		        	<v-card-text class="my-4 text-body-1">
+		          		Are you sure that this transaction is already paid?
+		        	</v-card-text>
+
+		        	<v-divider></v-divider>
+
+		        	<v-card-actions>
+		          		<v-spacer></v-spacer>
+		          		<v-btn
+		          			color="grey"
+		          			text
+		          			@click="updatePaidDialog = false"
+	          			>Cancel</v-btn>
+		          		<v-btn
+		            		color="primary"
+		            		text
+		            		:disabled="updatePaidDialogDisable"
+		            		@click="updateOrderPaid"
+		          		>Paid</v-btn>
 		        	</v-card-actions>
 		      	</v-card>
 		    </v-dialog>
@@ -455,9 +503,12 @@
 		},
 		data: () => ({
 			search: "",
+			transactionId: null,
 			searchLoading: false,
 			updateStatusDialog: false,
 			updateStatusDialogDisable: false,
+			updatePaidDialog: false,
+			updatePaidDialogDisable: false,
 			addItemDialog: false,
 			addItemDialogDisable: false,
 			editItemDialog: false,
@@ -537,6 +588,7 @@
 				'save': 'orders/save',
 				'update': 'orders/update',
 				'updateStatus': 'orders/updateStatus',
+				'paid': 'orders/paid',
 				'destroy': 'orders/destroy'
 			}),
 			computeUnitTotal(order, index) {
@@ -562,6 +614,11 @@
 					status: status
 				};
 				vm.updateStatusDialog = true;
+			},
+			openUpdatePaidDialog(transactionId) {
+				let vm = this
+				vm.transactionId = transactionId;
+				vm.updatePaidDialog = true;
 			},
 			hideAddItemDialog() {
 				let vm = this;
@@ -681,6 +738,17 @@
 
 				vm.updateStatusDialog = false;
 				vm.updateStatusDialogDisable = false;
+			},
+			async updateOrderPaid() {
+				let vm = this;
+
+				vm.updatePaidDialogDisable = true;
+
+				await vm.paid(vm.transactionId);
+				await vm.fetchByVendor();
+
+				vm.updatePaidDialog = false;
+				vm.updatePaidDialogDisable = false;
 			},
 			searchList: _.debounce(async function(query) {
 	        	let vm = this;

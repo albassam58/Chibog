@@ -51,7 +51,7 @@ class BaseController extends Controller
 		return $builder->get();
 	}
 
-	public function sendResponse($result = [], $message = "Success")
+	public function sendResponse($result = null, $message = "Success")
 	{
 		$response = [
 			'success' 	=> true,
