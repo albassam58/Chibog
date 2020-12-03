@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\API\v1\LoginController;
+use App\Http\Controllers\API\v1\AuthenticateController;
 use App\Http\Controllers\API\v1\RegisterController;
 use App\Http\Controllers\API\v1\VendorController;
 use App\Http\Controllers\API\v1\ItemController;
@@ -37,12 +37,14 @@ Route::group(['prefix' => 'v1'], function() {
 });
 
 Route::group(['prefix' => 'v1/vendor'], function() {
-	Route::post('/login', [LoginController::class, 'login']);
+	Route::post('/login', [AuthenticateController::class, 'login']);
 	Route::post('/register', [RegisterController::class, 'register']);
 
 	Route::get('/current', [VendorController::class, 'currentUser'])->middleware(['auth:sanctum']);
 	Route::get('/tokens', [VendorController::class, 'tokens'])->middleware(['auth:sanctum', 'vendor_is_verified']);
-	Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
+	Route::post('/logout', [AuthenticateController::class, 'logout'])->middleware('auth:sanctum');
+	Route::post('/logout/device/{id}', [AuthenticateController::class, 'logoutDevice'])->middleware('auth:sanctum');
+	Route::post('/logout/all', [AuthenticateController::class, 'logoutAll'])->middleware('auth:sanctum');
 
 	// email verification vendor
 	Route::get('/verify/{id}', [VendorController::class, 'verify'])->name('vendor.verify')->middleware('signed');
@@ -62,6 +64,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum', 'vendor_is_veri
 
 	// orders
 	Route::post('/orders/update/status', [OrderController::class, 'updateStatus']);
+	Route::post('/orders/update/paid/{transactionId}', [OrderController::class, 'updatePaid']);
 	Route::get('/orders/vendor', [OrderController::class, 'vendor']);
 	Route::apiResource('orders', OrderController::class);
 

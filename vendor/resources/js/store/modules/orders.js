@@ -19,7 +19,7 @@ const actions = {
             let { data } = await axios.get(`/v1/orders/vendor?${ params }`);
             commit('setOrders', data.data);
         } catch (err) {
-            console.log(err)
+            throw err;
         }
     },
     async save({ commit }, form) {
@@ -27,7 +27,7 @@ const actions = {
             let { data } = await axios.post('/v1/orders', form);
             commit('setOrder', data.data);
         } catch (err) {
-
+            throw err;
         }
     },
     async update({ commit }, { id, form }) {
@@ -35,7 +35,7 @@ const actions = {
             let { data } = await axios.put(`/v1/orders/${ id }`, form);
             commit('setOrder', data.data);
         } catch (err) {
-
+            throw err;
         }
     },
     async updateStatus({ commit }, { transactionId, status }) {
@@ -46,14 +46,21 @@ const actions = {
             };
             let { data } = await axios.post('/v1/orders/update/status', request);
         } catch (err) {
-
+            throw err;
+        }
+    },
+    async paid({ commit }, transactionId) {
+        try {
+            let { data } = await axios.post(`/v1/orders/update/paid/${ transactionId }`);
+        } catch (err) {
+            throw err;
         }
     },
     async destroy({ commit }, id) {
         try {
             let { data } = await axios.delete(`/v1/orders/${ id }`);
         } catch (err) {
-
+            throw err;
         }
     }
 };

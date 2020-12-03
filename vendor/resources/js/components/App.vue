@@ -60,7 +60,7 @@
                         </v-btn>
                     </template>
                     <v-list>
-                        <v-list-item>
+                        <v-list-item @click="$router.push('/vendor')">
                             <v-list-item-title>
                                 <v-icon>mdi-account</v-icon>
                                 {{ vendor.first_name }}
@@ -135,7 +135,7 @@
 			let vm = this;
             let darkMode = localStorage.getItem('darkMode');
 
-			await vm.getVendor();
+            await vm.getVendor();
 
             // check if email is verified, if not, redirect to email verification
             if (vm.vendor && !vm.vendor.email_verified_at) {
@@ -155,7 +155,6 @@
                 socket.on(`order-${ vm.vendor.id }:App\\Events\\Order`, data => {
                     vm.fetchNotificationVendor();
                     vm.$refs.orderNotificationRef.updateOrderNotification(data.data);
-                    console.log(data.data);
                     // if (this.activeChannel == channel.id) {
                     //     this.messages.push(data.data);
                     // }

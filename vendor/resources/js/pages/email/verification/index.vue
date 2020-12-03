@@ -54,8 +54,7 @@
 	export default {
 		data: () => ({
 			alreadyVerified: false,
-			verificationError: false,
-			vendor: JSON.parse(localStorage.getItem('current_vendor'))
+			verificationError: false
 		}),
 		async created() {
 			let vm = this;
@@ -78,9 +77,10 @@
 			}
 		},
 		computed: {
-			...mapState('verification', {
-				verification: state => state.verification,
-				resent: state => state.resent
+			...mapState({
+				verification: state => state.verification.verification,
+				resent: state => state.verification.resent,
+				vendor: state => state.currentVendor.vendor
 			}),
 		},
 		methods: {

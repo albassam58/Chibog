@@ -35,7 +35,7 @@ class OrderController extends BaseController
                         $query->where('vendor_id', $userId);
                     })
                     ->where('orders.status', '>', 1)
-                    ->selectRaw('GROUP_CONCAT(orders.id) AS order_id, transaction_id, special_instruction, orders.store_id AS store_id, GROUP_CONCAT(item_id) AS item_id, GROUP_CONCAT(items.name) AS item_name, GROUP_CONCAT(orders.amount) AS amount, GROUP_CONCAT(quantity) AS quantity, customer_first_name, customer_last_name, customer_region, customer_province, customer_city, customer_barangay, customer_street, customer_mobile_number, customer_email, orders.status AS status')
+                    ->selectRaw('GROUP_CONCAT(orders.id) AS order_id, transaction_id, special_instruction, orders.is_paid, orders.store_id AS store_id, GROUP_CONCAT(item_id) AS item_id, GROUP_CONCAT(items.name) AS item_name, GROUP_CONCAT(orders.amount) AS amount, GROUP_CONCAT(quantity) AS quantity, customer_first_name, customer_last_name, customer_region, customer_province, customer_city, customer_barangay, customer_street, customer_mobile_number, customer_email, orders.status AS status')
                     ->leftJoin('items', 'items.id', '=', 'orders.item_id')
                     ->groupBy('transaction_id');
 
@@ -142,11 +142,32 @@ class OrderController extends BaseController
             $transactionId = $request->transactionId;
             $status = $request->status;
 
-            Order::where('transaction_id', $transactionId)->update([
+            $order = Order::where('transaction_id', $transactionId)->firstOrFail();
+            $order->update([
                 'status' => $status
             ]);
 
-            return $this->sendResponse();
+            return $this->sendResponse($order);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePaid($transactionId)
+    {
+        try {
+            $order = Order::where('transaction_id', $transactionId)->firstOrFail();
+            $order->update([
+                'is_paid' => 1
+            ]);
+
+            return $this->sendResponse($order);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

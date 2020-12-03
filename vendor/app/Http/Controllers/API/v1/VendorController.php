@@ -6,6 +6,7 @@ use App\Http\Controllers\API\v1\BaseController;
 use App\Http\Controllers\SendMailController;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VendorController extends BaseController
 {
@@ -34,7 +35,16 @@ class VendorController extends BaseController
     public function tokens(Request $request)
     {
         try {
-            return $this->sendResponse($request->user()->tokens);
+            $vendor = $request->user();
+
+            $id = $vendor->currentAccessToken()->id;
+            $tokens = $vendor->tokens;
+
+            $filtered = $tokens->filter(function ($object) use($id) {
+                return $object->id !== $id;
+            });
+
+            return $this->sendResponse($filtered);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }
