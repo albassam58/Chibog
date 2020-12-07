@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API\v1;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\v1\BaseController;
+use Image;
+use Log;
 
 class ItemController extends BaseController
 {
@@ -47,13 +49,37 @@ class ItemController extends BaseController
      */
     public function store(Request $request)
     {
-        // $request->merge([
-        //     'status'        => 5 // not available
-        // ]);
+        try {
+            $limit = 15;
 
-        $item = Item::create($request->all());
+            $countItems = Item::where('store_id', $request->store_id)->where('created_by', auth('sanctum')->user()->id)->count();
 
-        return $this->sendResponse($item);
+            if ($countItems >= $limit) throw new \Exception("Items limit exceeded. You are only allowed to make $limit items per store.");
+
+            $item = Item::create($request->except('image'));
+
+            $directory = public_path('items/' . $item->id);
+
+            // delete all files
+            recursiveDelete($directory);
+
+            $image = $request->file('image');
+
+            // initialize directory again to create folders
+            $directory = public_path('items/' . $item->id);
+            $fileName = time() . '.' . $request->image->getClientOriginalExtension();
+
+            resizeAndSave($image, $directory, $fileName, 150, 150);
+
+            $filePath = "items/" . $item->id . "/" . $fileName;
+            $item->update([
+                'image' => $filePath
+            ]);
+
+            return $this->sendResponse($item);
+        } catch(\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 
     /**
@@ -88,7 +114,29 @@ class ItemController extends BaseController
     public function update(Request $request, Item $item)
     {
         try {
-            $item->update($request->all());
+            $item->update($request->except('image'));
+
+            if ($request->hasFile('image')) {
+                $directory = public_path('items/' . $item->id);
+
+                // delete all files
+                recursiveDelete($directory);
+
+                $image = $request->file('image');
+
+                // initialize directory again to create folders
+                $directory = public_path('items/' . $item->id);
+
+                $fileName = time() . '.' . $request->image->getClientOriginalExtension();
+
+                resizeAndSave($image, $directory, $fileName, 150, 150);
+
+                $filePath = "items/" . $item->id . "/" . $fileName;
+                $item->update([
+                    'image' => $filePath
+                ]);
+            }
+
             return $this->sendResponse($item);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());

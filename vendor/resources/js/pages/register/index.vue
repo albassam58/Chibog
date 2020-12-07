@@ -73,6 +73,16 @@
                                 ></v-text-field>
 
                                 <v-text-field
+                                    label="Social Media"
+                                    name="social_media"
+                                    prepend-icon="mdi-link"
+                                    type="url"
+                                    v-model="form.social_media"
+                                    required
+                                    :rules="urlRules"
+                                ></v-text-field>
+
+                                <v-text-field
                                     id="password"
                                     label="Password"
                                     name="password"
@@ -167,6 +177,10 @@
             emailRules: [
                 v => !!v || 'Field is required',
                 v => /.+@.+/.test(v) || 'E-mail must be valid',
+            ],
+            urlRules: [
+                v => !!v || 'Field is required',
+                v => /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/.test(v) || 'Url must be valid'
             ],
             passwordRules: [
                 v => !!v || 'Field is required',

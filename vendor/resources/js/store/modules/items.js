@@ -38,7 +38,15 @@ const actions = {
 	},
 	async update({ commit }, form) {
 		try {
-			let { data } = await axios.put(`/v1/items/${ form.id }`, form);
+			let id = form.id;
+			if (!id) {
+				// display the key/value pairs
+				for (var pair of form.entries()) {
+					if (pair[0] == "id") id = pair[1];
+				}
+			}
+
+			let { data } = await axios.post(`/v1/items/${ id }`, form);
 			commit('setItem', data.data);
 		} catch (err) {
 			throw err;

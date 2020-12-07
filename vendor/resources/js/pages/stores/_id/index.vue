@@ -42,6 +42,14 @@
 			    	v-model="valid"
 			    	lazy-validation
 			  	>
+			  		<v-file-input
+				    	:rules="imageRules"
+				    	accept="image/png, image/jpeg"
+				    	placeholder="Pick an image"
+				    	prepend-icon="mdi-camera"
+				    	label="Image"
+				    	v-model="file"
+				  	></v-file-input>
 			    	<v-text-field
 			      		v-model="form.name"
 			      		:rules="rules"
@@ -55,36 +63,6 @@
 			      		label="Short description about your item"
 			      		required
 			    	></v-textarea>
-
-			    	<!-- <v-select
-			      		v-model="form.cuisine_id"
-			      		:items="cuisines"
-			      		:rules="rules"
-			      		item-value="id"
-			      		item-text="name"
-			      		label="Cuisine"
-			      		required
-			    	></v-select>
-
-			    	<v-select
-			      		v-model="form.meal"
-			      		:items="meals"
-			      		:rules="rules"
-			      		item-value="id"
-			      		item-text="name"
-			      		label="Meal"
-			      		required
-			    	></v-select>
-
-			    	<v-select
-			      		v-model="form.food_type_id"
-			      		:items="foodTypes"
-			      		:rules="rules"
-			      		item-value="id"
-			      		item-text="name"
-			      		label="Food Type"
-			      		required
-			    	></v-select> -->
 
 			    	<v-select
 			      		v-model="form.dish"
@@ -128,42 +106,40 @@
 
 		<v-simple-table>
 			<template v-slot:default>
-		      <thead>
-		        <tr>
-		          <th class="text-left">Name</th>
-		          <th class="text-left">Description</th>
-		          <th class="text-left">Type of Dish</th>
-		          <!-- <th class="text-left">Cuisine</th>
-		          <th class="text-left">Meal</th> -->
-		          <th class="text-left">Amount</th>
-		          <th class="text-left">Status</th>
-		          <th class="text-center"></th>
-		        </tr>
-		      </thead>
-		      <tbody>
-		        <tr
-		          v-for="item in items"
-		          :key="item.name"
-		        >
-		          <td>{{ item.name }}</td>
-		          <td>{{ item.description }}</td>
-		          <td>{{ item.dishValue.name }}</td>
-		          <!-- <td>{{ item.cuisine ? item.cuisine.name : null }}</td>
-		          <td>{{ findMeal(item) }}</td> -->
-		          <td>{{ item.amount.toFixed(2) }}</td>
-		          <td>{{ item.status.name }}</td>
-		          <td class="text-center">
-		          	<v-btn
-		          		v-if="item.status.id == 4 || item.status.id == 5"
-		          		@click="openEditItemDialog(item)"
-		          		color="primary"
-		          		icon
-		          	>
-		          		<v-icon>mdi-pencil</v-icon>
-		          	</v-btn>
-		          </td>
-		        </tr>
-		      </tbody>
+		      	<thead>
+		        	<tr>
+		        		<th></th>
+		          		<th class="text-left">Name</th>
+		          		<th class="text-left">Description</th>
+		          		<th class="text-left">Type of Dish</th>
+		          		<th class="text-left">Amount</th>
+		          		<th class="text-left">Status</th>
+		          		<th class="text-center"></th>
+		        	</tr>
+		      	</thead>
+		      	<tbody>
+		        	<tr
+		          		v-for="item in items"
+		          		:key="item.id"
+		        	>
+		        		<td><img :src="item.image ? `/${ item.image }` : `https://via.placeholder.com/50/FFFFFF/000000?text=${ item.name.charAt(0) }`" height="50" /></td>
+		          		<td>{{ item.name }}</td>
+		          		<td>{{ item.description }}</td>
+		          		<td>{{ item.dishValue.name }}</td>
+		          		<td>{{ item.amount.toFixed(2) }}</td>
+		          		<td>{{ item.status.name }}</td>
+		          		<td class="text-center">
+		          			<v-btn
+		          				v-if="item.status.id == 4 || item.status.id == 5"
+		          				@click="openEditItemDialog(item)"
+		          				color="primary"
+		          				icon
+		          			>
+		          				<v-icon>mdi-pencil</v-icon>
+		          			</v-btn>
+		          		</td>
+		        	</tr>
+		      	</tbody>
 		    </template>
 		</v-simple-table>
 
@@ -183,6 +159,15 @@
 				    	ref="editItemForm"
 				    	lazy-validation
 				  	>
+				  		<v-file-input
+					    	:rules="editImageRules"
+					    	accept="image/png, image/jpeg"
+					    	placeholder="Pick an image"
+					    	prepend-icon="mdi-camera"
+					    	label="Image"
+					    	v-model="editFile"
+					  	></v-file-input>
+
 				    	<v-text-field
 				      		v-model="editForm.name"
 				      		:rules="rules"
@@ -196,36 +181,6 @@
 				      		label="Short description about your item"
 				      		required
 				    	></v-textarea>
-
-				    	<!-- <v-select
-				      		v-model="editForm.cuisine_id"
-				      		:items="cuisines"
-				      		:rules="rules"
-				      		item-value="id"
-				      		item-text="name"
-				      		label="Cuisine"
-				      		required
-				    	></v-select>
-
-				    	<v-select
-				      		v-model="editForm.meal"
-				      		:items="meals"
-				      		:rules="rules"
-				      		item-value="id"
-				      		item-text="name"
-				      		label="Meal"
-				      		required
-				    	></v-select> -->
-
-				    	<!-- <v-select
-				      		v-model="editForm.food_type_id"
-				      		:items="foodTypes"
-				      		:rules="rules"
-				      		item-value="id"
-				      		item-text="name"
-				      		label="Food Type"
-				      		required
-				    	></v-select> -->
 
 				    	<v-select
 				      		v-model="editForm.dish"
@@ -291,12 +246,21 @@
 			valid: true,
 			loading: false,
 			form: {},
+			file: null,
 			editForm: {},
+			editFile: null,
 			editItemDialog: false,
 			editItemDialogDisable: false,
 			rules: [
       			v => !!v || 'Field is required',
       		],
+      		imageRules: [
+      			v => !!v || 'Field is required',
+	        	v => !v || v.size < 2000000 || 'Image size should be less than 2 MB!',
+	      	],
+	      	editImageRules: [
+	        	v => !v || v.size < 2000000 || 'Image size should be less than 2 MB!',
+	      	],
 	        meals: [
 	        	{ id: 1, name: 'Breakfast' },
 	        	{ id: 2, name: 'Lunch' },
@@ -358,10 +322,7 @@
 					id: item.id,
 					name: item.name,
 					description: item.description,
-					cuisine_id: item.cuisine_id,
-					meal: item.meal,
 					dish: item.dish,
-					food_type_id: item.food_type_id,
 					amount: item.amount,
 					status: item.status.id
 				};
@@ -381,25 +342,43 @@
 			async submit() {
 				let vm = this;
 
+ 				let formData = new FormData();
+ 				for(let index in vm.form) {
+ 					formData.append(index, vm.form[index]);
+ 				}
+ 				formData.append('store_id', vm.$route.params.id);
+ 				formData.append("image", vm.file);
+
 				let valid = vm.$refs.form.validate();
         		if (valid) {
 					vm.form.store_id = vm.$route.params.id;
-					await vm.saveItem(vm.form);
+					await vm.saveItem(formData);
 
 					vm.$refs.form.resetValidation()
 					vm.form = {};
+					vm.file = null;
 					await vm.fetchItems();
 				}
 			},
 			async editItem() {
 				let vm = this;
 				vm.editItemDialogDisable = true;
+
+				let formData = new FormData();
+ 				for(let index in vm.editForm) {
+ 					formData.append(index, vm.editForm[index]);
+ 				}
+ 				formData.append("image", vm.editFile);
+ 				// method spoofing	
+ 				formData.append("_method", "PUT");
+
 				let valid = vm.$refs.editItemForm.validate();
         		if (valid) {
         			try {
-						await vm.updateItem(vm.editForm);
+						await vm.updateItem(formData);
 						vm.$refs.editItemForm.resetValidation()
 						vm.editForm = {};
+						vm.editFile = null;
 						await vm.fetchItems();
 					} catch (err) {
 						console.log(err);
