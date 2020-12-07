@@ -28,7 +28,7 @@
                                     label="Login"
                                     name="login"
                                     prepend-icon="mdi-account"
-                                    type="text"
+                                    type="email"
                                     v-model="form.email"
                                     @keyup.enter="login"
                                 ></v-text-field>

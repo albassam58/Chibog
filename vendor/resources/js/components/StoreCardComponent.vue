@@ -85,6 +85,11 @@
 		      		</div>
 		      		<div class="subtitle-1">
 		        		<!-- $ • Italian, Cafe -->
+		        		<v-icon>mdi-link</v-icon>
+		        		<a :href="`${ store.vendor ? store.vendor.social_media : '' }`">{{ store.vendor ? store.vendor.social_media : "" }}</a>
+		      		</div>
+		      		<div class="subtitle-1">
+		        		<!-- $ • Italian, Cafe -->
 		        		<v-icon>mdi-map-marker</v-icon>
 		        		{{ completeAddress(store) }}
 		      		</div>
