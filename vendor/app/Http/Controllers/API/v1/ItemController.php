@@ -54,7 +54,7 @@ class ItemController extends BaseController
 
             $countItems = Item::where('store_id', $request->store_id)->where('created_by', auth('sanctum')->user()->id)->count();
 
-            if ($countItems >= $limit) throw new \Exception("Items limit exceeded. You are only allowed to make $limit items per store.");
+            if ($countItems >= $limit) throw new \Exception("Item limit exceeded. You are only allowed to make $limit items per store.");
 
             $item = Item::create($request->except('image'));
 

@@ -38,6 +38,7 @@
 			>
 				<div class="text-h5">Add Item</div>
 				<v-form
+					v-if="items.length < 15"
 			    	ref="form"
 			    	v-model="valid"
 			    	lazy-validation
@@ -101,6 +102,15 @@
 			      		Submit
 			    	</v-btn>
 			  	</v-form>
+
+			  	<v-div fill-height v-else>
+					<v-layout row wrap align-center>
+						<v-row>
+							<v-col cols="12"><div class="text-h2 text-center">Whoops</div></v-col>
+							<v-col cols="12"><div class="text-h5 text-center text--secondary">Item limit exceeded. You are only allowed to make 15 items per store.</div></v-col>
+						</v-row>
+					</v-layout>
+				</v-div>
 			</v-col>
 		</v-row>
 
