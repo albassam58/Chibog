@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class SendVerificationEmail implements ShouldQueue
+class SendUpdateStoreStatusEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -44,7 +44,7 @@ class SendVerificationEmail implements ShouldQueue
     {
         $details = $this->details;
 
-        Mail::send('emails.email-verification', $details, function($message) use($details) {
+        Mail::send('emails.update-store-status', $details, function($message) use($details) {
             $message = $message->to($this->to);
             
             // with cc

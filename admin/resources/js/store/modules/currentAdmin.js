@@ -1,29 +1,29 @@
 const state = {
 	authenticated: false,
-	vendor: null,
+	admin: null,
 	tokens: []
 };
 const getters = {};
 const actions = {
-	async getVendor({ commit }) {
+	async getAdmin({ commit }) {
 		try {
 			if (localStorage.getItem('authenticated')) {
-				let { data } = await axios.get('/v1/vendor/current');
-				commit('setVendor', data.data);
+				let { data } = await axios.get('/v1/admin/current');
+				commit('setAdmin', data.data);
 			}
 		} catch (err) {
 			throw err;
 		}
 	},
-	async getVendorTokens({ commit }) {
+	async getAdminTokens({ commit }) {
 		try {
-			let { data } = await axios.get('/v1/vendor/tokens');
+			let { data } = await axios.get('/v1/admin/tokens');
 			commit('setTokens', data.data);
 		} catch (err) {
 			throw err;
 		}
 	},
-	async loginVendor({commit}, credentials) {
+	async loginAdmin({commit}, credentials) {
 		try {
 			axios.defaults.baseURL = '/';
 			await axios.post('/login', credentials);
@@ -32,14 +32,14 @@ const actions = {
 			throw err;
 		}
 	},
-	async registerVendor({commit}, vendor) {
+	async registerAdmin({commit}, admin) {
 		try {
-			await axios.post('/v1/vendor/register', vendor);
+			await axios.post('/v1/admin/register', admin);
 		} catch (err) {
 			throw err;
 		}
 	},
-	async logoutVendor() {
+	async logoutAdmin() {
 		try {
 			axios.defaults.baseURL = '/';
 			await axios.post('/logout');
@@ -50,7 +50,7 @@ const actions = {
 	},
 	async logoutDevice({ commit }, id) {
 		try {
-			await axios.post(`/v1/vendor/logout/device/${ id }`);
+			await axios.post(`/v1/admin/logout/device/${ id }`);
 		} catch (err) {
 			throw err;
 		}
@@ -58,15 +58,15 @@ const actions = {
 	// logout all devices except current access
 	async logoutAll({ commit }) {
 		try {
-			await axios.post(`/v1/vendor/logout/all`);
+			await axios.post(`/v1/admin/logout/all`);
 		} catch (err) {
 			throw err;
 		}
 	}
 };
 const mutations = {
-	setVendor(state, vendor) {
-		state.vendor = vendor;
+	setAdmin(state, admin) {
+		state.admin = admin;
 		state.authenticated = true;
 	},
 	setTokens(state, tokens) {

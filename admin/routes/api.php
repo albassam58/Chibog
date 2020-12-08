@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\v1\AuthenticateController;
 use App\Http\Controllers\API\v1\RegisterController;
+use App\Http\Controllers\API\v1\AdminController;
 use App\Http\Controllers\API\v1\VendorController;
 use App\Http\Controllers\API\v1\ItemController;
 use App\Http\Controllers\API\v1\StoreController;
@@ -36,26 +37,30 @@ Route::group(['prefix' => 'v1'], function() {
 	Route::get('/barangays/{provinceName}/{cityName}', [BarangayController::class, 'show']);
 });
 
-Route::group(['prefix' => 'v1/vendor'], function() {
+Route::group(['prefix' => 'v1/admin'], function() {
 	Route::post('/login', [AuthenticateController::class, 'login']);
-	Route::post('/register', [RegisterController::class, 'register']);
+	// Route::post('/register', [RegisterController::class, 'register']);
 
-	Route::get('/current', [VendorController::class, 'currentUser'])->middleware(['auth:sanctum']);
-	Route::get('/tokens', [VendorController::class, 'tokens'])->middleware(['auth:sanctum', 'vendor_is_verified']);
+	Route::get('/current', [AdminController::class, 'currentUser'])->middleware(['auth:sanctum']);
+	// Route::get('/tokens', [AdminController::class, 'tokens'])->middleware(['auth:sanctum', 'admin_is_verified']);
 	Route::post('/logout', [AuthenticateController::class, 'logout'])->middleware('auth:sanctum');
-	Route::post('/logout/device/{id}', [AuthenticateController::class, 'logoutDevice'])->middleware('auth:sanctum');
-	Route::post('/logout/all', [AuthenticateController::class, 'logoutAll'])->middleware('auth:sanctum');
+	// Route::post('/logout/device/{id}', [AuthenticateController::class, 'logoutDevice'])->middleware('auth:sanctum');
+	// Route::post('/logout/all', [AuthenticateController::class, 'logoutAll'])->middleware('auth:sanctum');
 
-	// email verification vendor
-	Route::get('/verify/{id}', [VendorController::class, 'verify'])->name('vendor.verify')->middleware('signed');
-	Route::get('/resend/{id}/{email}', [VendorController::class, 'resend'])->name('vendor.resend');
+	// email verification admin
+	// Route::get('/verify/{id}', [AdminController::class, 'verify'])->name('admin.verify')->middleware('signed');
+	// Route::get('/resend/{id}/{email}', [AdminController::class, 'resend'])->name('admin.resend');
 });
 
-Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum', 'vendor_is_verified']], function() {
+Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum', 'admin_is_verified']], function() {
+
+	Route::get('/vendor-url', function() {
+		return config('app.vendor_url');
+	});
 
 	// stores
-	Route::get('/stores/vendor', [StoreController::class, 'vendor']);
-	Route::post('/stores/upload', [StoreController::class, 'upload']);
+	// Route::get('/stores/vendor', [StoreController::class, 'vendor']);
+	// Route::post('/stores/upload', [StoreController::class, 'upload']);
 	Route::apiResource('stores', StoreController::class);
 
 	Route::apiResource('cuisines', CuisineController::class);
@@ -63,23 +68,23 @@ Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum', 'vendor_is_veri
 	Route::apiResource('items', ItemController::class);
 
 	// orders
-	Route::post('/orders/update/status', [OrderController::class, 'updateStatus']);
-	Route::post('/orders/update/paid/{transactionId}', [OrderController::class, 'updatePaid']);
-	Route::get('/orders/vendor', [OrderController::class, 'vendor']);
-	Route::apiResource('orders', OrderController::class);
+	//Route::post('/orders/update/status', [OrderController::class, 'updateStatus']);
+	//Route::post('/orders/update/paid/{transactionId}', [OrderController::class, 'updatePaid']);
+	//Route::get('/orders/vendor', [OrderController::class, 'vendor']);
+	// Route::apiResource('orders', OrderController::class);
 
 	// order notifications
-	Route::get('/order-notifications/vendor', [OrderNotificationController::class, 'vendor']);
-	Route::get('/order-notifications/vendor/popup', [OrderNotificationController::class, 'popup']);
-	Route::get('/order-notifications/count/unread', [OrderNotificationController::class, 'countUnread']);
-	Route::put('/order-notifications/read/checked/{ids}', [OrderNotificationController::class, 'readChecked']);
-	Route::delete('/order-notifications/delete/checked/{ids}', [OrderNotificationController::class, 'destroyChecked']);
-	Route::apiResource('order-notifications', OrderNotificationController::class);
+	// Route::get('/order-notifications/vendor', [OrderNotificationController::class, 'vendor']);
+	// Route::get('/order-notifications/vendor/popup', [OrderNotificationController::class, 'popup']);
+	// Route::get('/order-notifications/count/unread', [OrderNotificationController::class, 'countUnread']);
+	// Route::put('/order-notifications/read/checked/{ids}', [OrderNotificationController::class, 'readChecked']);
+	// Route::delete('/order-notifications/delete/checked/{ids}', [OrderNotificationController::class, 'destroyChecked']);
+	// Route::apiResource('order-notifications', OrderNotificationController::class);
 
 	// statistics
-	Route::get('/statistics/sales', [StatisticController::class, 'sales']);
-	Route::get('/statistics/orders', [StatisticController::class, 'orders']);
-	Route::get('/statistics/total-sales', [StatisticController::class, 'totalSales']);
-	Route::get('/statistics/total-orders', [StatisticController::class, 'totalOrders']);
-	Route::get('/statistics/orders-per-status', [StatisticController::class, 'ordersPerStatus']);
+	// Route::get('/statistics/sales', [StatisticController::class, 'sales']);
+	// Route::get('/statistics/orders', [StatisticController::class, 'orders']);
+	// Route::get('/statistics/total-sales', [StatisticController::class, 'totalSales']);
+	// Route::get('/statistics/total-orders', [StatisticController::class, 'totalOrders']);
+	// Route::get('/statistics/orders-per-status', [StatisticController::class, 'ordersPerStatus']);
 });

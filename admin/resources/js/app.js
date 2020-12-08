@@ -21,11 +21,14 @@ files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
-import router from "./router/index";
-import App from "@components/App";
-import vuetify from "./plugins/vuetify";
-import store from "./store";
+import router from "./router/index"
+import App from "@components/App"
+import vuetify from "./plugins/vuetify"
+import store from "./store"
 import Axios from "./axios"
+import CustomDataTable from "@components/CustomDataTableComponent"
+
+Vue.component('custom-data-table', CustomDataTable);
 
 window.axios = Axios;
 

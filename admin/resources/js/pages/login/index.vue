@@ -64,17 +64,17 @@
             isLoggedIn: true
         }),
         computed: {
-            ...mapState('currentVendor', {
+            ...mapState('currentAdmin', {
                 status: state => state.status,
-                vendor: state => state.vendor
+                admin: state => state.admin
             })
         },
 		methods: {
-            ...mapActions('currentVendor', ['loginVendor', 'getVendor']),
+            ...mapActions('currentAdmin', ['loginAdmin', 'getAdmin']),
             async login() {
                 let vm = this;
                 try {
-                    await vm.loginVendor(vm.form);
+                    await vm.loginAdmin(vm.form);
                     window.location.href = "/";
                 } catch (err) {
                     vm.form.password = "";
