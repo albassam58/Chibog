@@ -28,29 +28,6 @@ class VendorController extends BaseController
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function tokens(Request $request)
-    {
-        try {
-            $vendor = $request->user();
-
-            $id = $vendor->currentAccessToken()->id;
-            $tokens = $vendor->tokens;
-
-            $filtered = $tokens->filter(function ($object) use($id) {
-                return $object->id !== $id;
-            });
-
-            return $this->sendResponse($filtered);
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -114,95 +91,5 @@ class VendorController extends BaseController
     public function destroy(Vendor $vendor)
     {
         //
-    }
-
-    /**
-     * Display the current logged in user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function currentUser(Request $request)
-    {
-        try {
-            return $this->sendResponse($request->user());
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
-
-    /**
-     * Verify the vendor.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  integer  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function verify(Request $request, $id)
-    {
-        try {
-            $vendor = Vendor::findOrFail($id);
-
-            if ($vendor->email_verified_at) {
-                return $this->sendError("Email is already verified!", [], 422);
-            }
-
-            $date = date('Y-m-d H:i:s');
-            $vendor->email_verified_at = $date;
-            $vendor->save();
-
-            return $this->sendResponse("Email Verified!");
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        } catch (\Error $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
-
-    /**
-     * Resend email verification.
-     *
-     * @param  integer  $id
-     * @param  string   $email
-     * @return \Illuminate\Http\Response
-     */
-    public function resend($id, $email)
-    {
-        try {
-            $vendor = Vendor::where('id', $id)->where('email', $email)->first();
-
-            if (!$vendor) {
-                throw new \Exception("Vendor not found");
-            }
-
-            if ($vendor->email_verified_at) {
-                return $this->sendError("Email is already verified!", [], 422);
-            }
-
-            $emailVerificationUrl = $vendor->createEmailVerificationUrl();
-
-            // send verification email
-            $details = [
-                'subject' => 'Chibog - Email Verification',
-                'data' => [
-                    'first_name' => $vendor->first_name,
-                    'url' => $emailVerificationUrl
-                ]
-            ];
-
-            $data = [
-                'job'       => '\App\Jobs\SendVerificationEmail',
-                'to'        => $vendor->email,
-                'cc'        => null,
-                'bcc'       => null,
-                'details'   => $details,
-            ];
-
-            $this->mailController->sendMail($data);
-
-            return $this->sendResponse("Email verification is successfully resent.");
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
     }
 }
