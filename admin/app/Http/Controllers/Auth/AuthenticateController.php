@@ -12,7 +12,6 @@ class AuthenticateController extends Controller
     public function login(Request $request)
     {
         try {
-            Auth::guard('web')->logout();
             $credentials = $request->only('email', 'password');
 
             if (Auth::attempt($credentials)) {

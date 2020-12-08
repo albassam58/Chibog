@@ -3,12 +3,20 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\v1\BaseController;
+use App\Http\Controllers\SendMailController;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class StoreController extends BaseController
 {
+    protected $mailController;
+
+    public function __construct(SendMailController $mailController)
+    {
+        $this->mailController = $mailController;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,58 +25,14 @@ class StoreController extends BaseController
      */
     public function index(Request $request)
     {
-        $stores = new Store();
+        $params = $request->all();
+        $searchColumns = ['name'];
 
-        if ($request->exclude) {
-            $stores = $stores->withCount('reviews')->where('city', '<>', $request->exclude);
-        }
+        $query = new Store();
+        $query = $query->with('vendor');
+        $stores = $this->applySearch($query, $params, $searchColumns);
 
-        return $stores->paginate(50);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  string  $query
-     * @return \Illuminate\Http\Response
-     */
-    public function search($query)
-    {
-        $stores = new Store();
-
-        if ($query) {
-            $stores = $stores->where(function($q) use($query) {
-                $q->where('name', 'LIKE', "%$query%")
-                ->orWhere('region', 'LIKE', "%$query%")
-                ->orWhere('province', 'LIKE', "%$query%")
-                ->orWhere('city', 'LIKE', "%$query%")
-                ->orWhere('barangay', 'LIKE', "%$query%")
-                ->orWhere('street', 'LIKE', "%$query%");
-            });
-        }
-
-        return $stores->paginate(50);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function vendor()
-    {
-        return Store::where('vendor_id', Auth::user()->id)->withCount('reviews')->with('vendor')->paginate(50);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  string  $city
-     * @return \Illuminate\Http\Response
-     */
-    public function city($city)
-    {
-        return Store::where('city', $city)->paginate(50);
+        return $this->sendResponse($stores);
     }
 
     /**
@@ -89,15 +53,7 @@ class StoreController extends BaseController
      */
     public function store(Request $request)
     {
-        $request->merge([
-            'vendor_id'       => Auth::user()->id,
-            'schedule_day'  => implode(',', $request->schedule_day),
-            'status'        => 1
-        ]);
-
-        $store = Store::create($request->all());
-
-        return $this->sendResponse($store);
+        //
     }
 
     /**
@@ -109,7 +65,7 @@ class StoreController extends BaseController
     public function show($id)
     {
         try {
-            $store = Store::withCount('reviews')->with('vendor')->find($id);//->->first();
+            $store = Store::withCount('reviews')->with('vendor')->find($id);
             return $this->sendResponse($store);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
@@ -137,10 +93,28 @@ class StoreController extends BaseController
     public function update(Request $request, Store $store)
     {
         try {
-            $request->merge([
-                'schedule_day'  => implode(',', $request->schedule_day)
-            ]);
-            $store->update($request->except(['id', 'picture', 'vendor', 'reviews_count', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at']));
+            $store->update($request->all());
+
+            // send update order status email
+            $details = [
+                'subject' => 'Chibog - Store ' . $store->status_value,
+                'data' => [
+                    'first_name' => $store->vendor->first_name,
+                    'store' => $store->name,
+                    'status' => $store->status_value
+                ]
+            ];
+
+            $data = [
+                'job'       => '\App\Jobs\SendUpdateStoreStatusEmail',
+                'to'        => $store->vendor->email,
+                'cc'        => null,
+                'bcc'       => null,
+                'details'   => $details,
+            ];
+
+            $this->mailController->sendMail($data);
+
             return $this->sendResponse($store);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
@@ -156,57 +130,5 @@ class StoreController extends BaseController
     public function destroy(Store $store)
     {
         //
-    }
-
-    /**
-     * Upload a file in the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function upload(Request $request)
-    {
-        try {
-            $storeId = $request->store_id;
-            $directory = public_path('stores/' . $storeId);
-
-            // delete all files
-            recursiveDelete($directory);
-
-            // initialize directory again to create folders
-            $directory = public_path('stores/' . $storeId);
-            $fileName = time() . '.' . $request->file->getClientOriginalExtension();
-            $filePath = "stores/" . $storeId . "/" . $fileName;
-            $request->file->move($directory, $fileName);
-
-            $store = Store::find($storeId);
-            $store->update([
-                'logo' => $filePath
-            ]);
-
-            return $this->sendResponse($store);
-        } catch (\Error $e) {
-            return $this->sendError($e->getMessage());
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
-
-    /**
-     * Delete a file or recursively delete a directory
-     *
-     * @param string $str Path to file or directory
-     */
-    public function recursiveDelete($str)
-    {
-        if (is_file($str)) {
-            return @unlink($str);
-        } else if (is_dir($str)) {
-            $scan = glob(rtrim($str,'/') . '/*');
-            foreach($scan as $index=>$path) {
-                $this->recursiveDelete($path);
-            }
-            return @rmdir($str);
-        }
     }
 }

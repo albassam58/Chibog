@@ -57,22 +57,10 @@
                         </v-btn>
                     </template>
                     <v-list>
-                        <v-list-item @click="$router.push('/vendor')">
+                        <v-list-item>
                             <v-list-item-title>
                                 <v-icon>mdi-account</v-icon>
-                                {{ vendor.first_name }}
-                            </v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="$router.push('/orders')">
-                            <v-list-item-title>
-                                <v-icon>mdi-cart</v-icon>
-                                Orders
-                            </v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="$router.push('/statistics')">
-                            <v-list-item-title>
-                                <v-icon>mdi-chart-box</v-icon>
-                                Statistics
+                                {{ admin.first_name }}
                             </v-list-item-title>
                         </v-list-item>
                         <v-divider></v-divider>
@@ -92,7 +80,7 @@
                 </span>
             </v-app-bar>
 
-            <!--  v-if="!Object.entries(vendor).length || (Object.entries(vendor).length && vendor.email_verified_at && !$route.query.queryUrl)" -->
+            <!--  v-if="!Object.entries(admin).length || (Object.entries(admin).length && admin.email_verified_at && !$route.query.queryUrl)" -->
             <router-view :key="$route.fullPath" />
 
             <!-- <div v-else-if="alreadyVerified">
@@ -124,10 +112,10 @@
 			let vm = this;
             let darkMode = localStorage.getItem('darkMode');
 
-            await vm.getVendor();
+            await vm.getAdmin();
 
             // check if email is verified, if not, redirect to email verification
-            if (vm.vendor && !vm.vendor.email_verified_at) {
+            if (vm.admin && !vm.admin.email_verified_at) {
                 if (vm.$route.path != '/email/verification') {
                     vm.$router.push('/email/verification');
                 }
@@ -135,33 +123,18 @@
 
             // set dark mode
             vm.$vuetify.theme.dark = darkMode === 'true' ? true : false;
-
-            if (vm.vendor) {
-                // Connect to Socket.io
-                let socket = io(`http://localhost:3000`);
-
-                // ... listen for new events/messages
-                socket.on(`order-${ vm.vendor.id }:App\\Events\\Order`, data => {
-                    vm.fetchNotificationVendor();
-                    vm.$refs.orderNotificationRef.updateOrderNotification(data.data);
-                    // if (this.activeChannel == channel.id) {
-                    //     this.messages.push(data.data);
-                    // }
-                });
-            }
 		},
 		computed: {
 			...mapState({
-				authenticated: state => state.currentVendor.authenticated,
-				vendor: state => state.currentVendor.vendor,
+				authenticated: state => state.currentAdmin.authenticated,
+				admin: state => state.currentAdmin.admin,
                 verification: state => state.verification.verification
 			})
 		},
 		methods: {
 			...mapActions({
-                'fetchNotificationVendor': 'orderNotifications/fetchVendor',
-				'getVendor': 'currentVendor/getVendor',
-				'logoutVendor': 'currentVendor/logoutVendor',
+				'getAdmin': 'currentAdmin/getAdmin',
+				'logoutAdmin': 'currentAdmin/logoutAdmin',
                 'resend': 'verification/resend'
 			}),
             darkMode() {
@@ -173,7 +146,7 @@
             },
 			async logout() {
 				let vm = this;
-				await vm.logoutVendor();
+				await vm.logoutAdmin();
 
                 window.location.href = "/login";
 			}

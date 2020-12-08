@@ -185,7 +185,9 @@
 			        maxFiles: 1,
 			        acceptedFiles: "image/*",
 			        // addRemoveLinks: true, // add a link to every file preview to remove
-			        headers: { "Authorization": localStorage.getItem('api_token') }
+			        headers: {
+				        'X-CSRF-TOKEN': document.getElementsByName('csrf-token')[0].getAttribute('content')
+				    }
 			    },
 			    currentStore: this.store
 			}
