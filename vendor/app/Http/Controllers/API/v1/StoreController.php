@@ -89,15 +89,25 @@ class StoreController extends BaseController
      */
     public function store(Request $request)
     {
-        $request->merge([
-            'vendor_id'       => Auth::user()->id,
-            'schedule_day'  => implode(',', $request->schedule_day),
-            'status'        => 1
-        ]);
+        try {
+            $limit = 1;
 
-        $store = Store::create($request->all());
+            $countStores = Store::where('vendor_id', auth('sanctum')->user()->id)->count();
 
-        return $this->sendResponse($store);
+            if ($countStores >= $limit) throw new \Exception("Store limit exceeded. You are only allowed to make $limit store per vendor.");
+
+            $request->merge([
+                'vendor_id'       => Auth::user()->id,
+                'schedule_day'  => implode(',', $request->schedule_day),
+                'status'        => 1
+            ]);
+
+            $store = Store::create($request->all());
+
+            return $this->sendResponse($store);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 
     /**
@@ -173,11 +183,15 @@ class StoreController extends BaseController
             // delete all files
             recursiveDelete($directory);
 
+            $image = $request->file('file');
+
             // initialize directory again to create folders
             $directory = public_path('stores/' . $storeId);
             $fileName = time() . '.' . $request->file->getClientOriginalExtension();
+
+            resizeAndSave($image, $directory, $fileName, 500, 500);
+
             $filePath = "stores/" . $storeId . "/" . $fileName;
-            $request->file->move($directory, $fileName);
 
             $store = Store::find($storeId);
             $store->update([
