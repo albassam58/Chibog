@@ -6,7 +6,7 @@
   }
 </route>
 <template>
-	<v-container>
+	<v-container v-if="!storeLimit">
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
 				<div class="text-h4 mb-4">Add Store</div>
@@ -224,6 +224,27 @@
 	    	</v-btn>
 	  	</v-form>
 	</v-container>
+
+	<v-container fill-height v-else>
+		<v-row>
+			<v-col cols="6" class="d-flex flex-row">
+				<div class="text-h4 mb-4">Add Store</div>
+			</v-col>
+			<v-col cols="6" class="d-flex flex-row-reverse">
+				<v-btn color="secondary" dark @click="$router.back(-1)" text>
+					<v-icon>mdi-arrow-left</v-icon>
+					Back
+				</v-btn>
+			</v-col>
+		</v-row>
+
+		<v-layout row wrap align-center>
+			<v-row>
+					<v-col cols="12"><div class="text-h2 text-center">Whoops</div></v-col>
+					<v-col cols="12"><div class="text-h5 text-center text--secondary">Store limit exceeded. You are only allowed to make 1 store per vendor.</div></v-col>
+			</v-row>
+		</v-layout>
+	</v-container>
 </template>
 
 <script type="text/javascript">
@@ -249,10 +270,16 @@
 	        ],
       		checkbox: false,
       		timeInMenu: false,
-      		timeOutMenu: false
+      		timeOutMenu: false,
+      		storeLimit: false,
+      		itemLimit: false
     	}),
     	async created() {
     		let vm = this;
+
+    		await vm.fetchByVendor();
+
+    		if (vm.storesByVendor.length >= 1) vm.storeLimit = true;
 
     		await vm.fetchRegions();
     	},
@@ -263,6 +290,7 @@
     	// },
     	computed: {
     		...mapState('stores', {
+    			storesByVendor: state => state.storesByVendor,
     			store: state => state.store
     		}),
     		...mapState('regions', {
@@ -280,6 +308,7 @@
     	},
     	methods: {
     		...mapActions({
+    			'fetchByVendor': 'stores/fetchByVendor',
     			'save': 'stores/save',
     			'fetchRegions': 'regions/fetch',
     			'findProvincesByRegion': 'provinces/findByRegion',

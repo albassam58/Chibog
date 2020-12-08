@@ -20,6 +20,7 @@
 				class="d-flex flex-row-reverse"
 			>
 				<v-btn
+					v-if="storesByVendor.length < 1"
 					color="primary"
 					@click="$router.push('/stores/add')"
 				>
