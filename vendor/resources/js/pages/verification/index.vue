@@ -154,157 +154,6 @@
             	</v-stepper-items>
           	</v-stepper>
       	</v-container>
-
-
-		<!-- resent verification -->
-		<!-- <v-container
-			fill-height
-			v-if="resent"
-		>
-			<v-layout row wrap align-center>
-				<v-row>
-					<v-col cols="12">
-						<div class="text-h2 text-center">Email Verification</div>
-					</v-col>
-					<v-col cols="12">
-						<div class="text-h5 text-center text--secondary">
-							{{ resent }}
-						</div>
-					</v-col>
-					<v-col cols="12">
-						<v-btn
-							@click="resendVerification"
-							color="primary"
-						>Resend</v-btn>
-					</v-col>
-				</v-row>
-			</v-layout>
-		</v-container> -->
-
-		<!-- logged out but verified thru email link -->
-		<!-- <v-container
-			fill-height
-			v-else-if="Object.entries(verification).length"
-		>
-			<v-layout row wrap align-center>
-				<v-row v-if="verification.success">
-					<v-col cols="12">
-						<div class="text-h2 text-center">Email Verification</div>
-					</v-col>
-					<v-col cols="12">
-						<div class="text-h5 text-center text--secondary">
-							{{ verification.message }}
-						</div>
-					</v-col>
-					<v-col cols="12">
-						<v-btn
-							v-if="!vendor"
-							color="primary"
-							@click="$router.push('/login')"
-						>Login</v-btn>
-						<v-btn
-							v-else
-							color="primary"
-							@click="$router.push('/')"
-						>Home</v-btn>
-					</v-col>
-				</v-row>
-				<v-row v-else>
-					<v-col cols="12">
-						<div class="text-h2 text-center">Email Verification</div>
-					</v-col>
-					<v-col cols="12">
-						<div class="text-h5 text-center text--secondary">
-							{{ verification.message }}
-						</div>
-					</v-col>
-					<v-col cols="12" v-if="alreadyVerified">
-						<v-btn
-							v-if="!vendor"
-							color="primary"
-							@click="$router.push('/login')"
-						>Login</v-btn>
-						<v-btn
-							v-else
-							color="primary"
-							@click="$router.push('/')"
-						>Home</v-btn>
-					</v-col>
-					<v-col cols="12" v-else-if="verificationError">
-						<v-btn
-							@click="resendVerification"
-							color="primary"
-						>Resend</v-btn>
-					</v-col>
-					<v-col cols="12" v-else>
-						<div class="text-h5 text-center text--secondary">
-							Invalid link provided.
-						</div>
-					</v-col>
-				</v-row>
-			</v-layout>
-		</v-container> -->
-
-		<!-- logged in -->
-		<!-- <v-container
-			fill-height
-			v-else-if="vendor"
-		>
-			<v-layout row wrap align-center>
-				<v-row v-if="vendor.email_verified_at">
-					<v-col cols="12">
-						<div class="text-h2 text-center">Email Verification</div>
-					</v-col>
-					<v-col cols="12">
-						<div class="text-h5 text-center text--secondary">
-							Already verified
-						</div>
-					</v-col>
-					<v-col cols="12">
-						<v-btn
-							color="primary"
-							@click="$router.push('/')"
-						>Home</v-btn>
-					</v-col>
-				</v-row>
-				<v-row v-else>
-					<v-col cols="12">
-						<div class="text-h2 text-center">Email Verification</div>
-					</v-col>
-					<v-col cols="12">
-						<div class="text-h5 text-center text--secondary">
-							Please verify your email
-						</div>
-					</v-col>
-					<v-col cols="12">
-						<v-btn
-							@click="resendVerification"
-							color="primary"
-						>Resend</v-btn>
-					</v-col>
-				</v-row>
-			</v-layout>
-		</v-container> -->
-
-		<!-- invalid link -->
-		<!-- <v-container
-			fill-height
-			v-else
-		>
-			<v-layout row wrap align-center>
-				<v-row>
-					<v-col cols="12">
-						<div class="text-h2 text-center">Email Verification</div>
-					</v-col>
-					<v-col cols="12">
-						<div class="text-h5 text-center text--secondary">
-							Invalid link provided
-						</div>
-					</v-col>
-				</v-row>
-			</v-layout>
-		</v-container> -->
-
 	</div>
 </template>
 
@@ -418,6 +267,10 @@
 	            		vm.verifyingOtp = false;
 
 	            		vm.step = 2;
+
+	            		if (!vm.vendor.email_verified_at) {
+	            			vm.resendVerification();
+	            		}
             		}
             	} catch (err) {
             		vm.verifyingOtp = false;

@@ -13,9 +13,6 @@
                     sm="8"
                     md="6"
                 >
-                    <!-- <v-alert type="error" v-if="!status.registered">
-                      Register Error
-                    </v-alert> -->
                     <v-card class="elevation-12">
                         <v-toolbar
                             color="primary"
@@ -35,7 +32,6 @@
                                 <v-text-field
                                     label="First Name"
                                     name="first_name"
-                                    prepend-icon="mdi-account"
                                     type="text"
                                     v-model="form.first_name"
                                     required
@@ -45,7 +41,6 @@
                                 <v-text-field
                                     label="Last Name"
                                     name="last_name"
-                                    prepend-icon="mdi-account"
                                     type="text"
                                     v-model="form.last_name"
                                     required
@@ -55,7 +50,6 @@
                                 <v-text-field
                                     label="Email"
                                     name="email"
-                                    prepend-icon="mdi-account"
                                     type="email"
                                     v-model="form.email"
                                     required
@@ -65,7 +59,6 @@
                                 <v-text-field
                                     label="Mobile Number"
                                     name="mobile_number"
-                                    prepend-icon="mdi-account"
                                     type="text"
                                     v-model="form.mobile_number"
                                     required
@@ -73,20 +66,9 @@
                                 ></v-text-field>
 
                                 <v-text-field
-                                    label="Social Media"
-                                    name="social_media"
-                                    prepend-icon="mdi-link"
-                                    type="url"
-                                    v-model="form.social_media"
-                                    required
-                                    :rules="urlRules"
-                                ></v-text-field>
-
-                                <v-text-field
                                     id="password"
                                     label="Password"
                                     name="password"
-                                    prepend-icon="mdi-lock"
                                     type="password"
                                     v-model="form.password"
                                     required
@@ -97,7 +79,6 @@
                                     id="password_confirmation"
                                     label="Password Confirmation"
                                     name="password_confirmation"
-                                    prepend-icon="mdi-lock"
                                     type="password"
                                     v-model="form.password_confirmation"
                                     required
@@ -155,7 +136,11 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" @click="register">Register</v-btn>
+                            <v-btn
+                                color="primary"
+                                :disabled="disabled"
+                                @click="register"
+                            >Register</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-col>
@@ -170,6 +155,7 @@
     export default {
         data: () => ({
             valid: false,
+            disabled: false,
             form: {},
             rules: [
                 v => !!v || 'Field is required'
@@ -226,10 +212,14 @@
 
                 if (valid) {
                     try {
+                        vm.disabled = true;
+
                         await vm.registerVendor(vm.form);
                         vm.$router.push('/login');
+
+                        vm.disabled = false;
                     } catch(err) {
-                        vm.status.registered = false;
+                        vm.disabled = false;
                     }
                 }
             }
