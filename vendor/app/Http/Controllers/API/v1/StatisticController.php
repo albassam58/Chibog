@@ -16,7 +16,7 @@ class StatisticController extends BaseController
      */
     public function sales(Request $request)
     {
-        $user = Auth::user()->id;
+        $user = auth('sanctum')->user()->id;
         $stores = DB::select("
             SELECT id FROM stores WHERE vendor_id = $user
             AND deleted_at IS NULL
@@ -54,7 +54,7 @@ class StatisticController extends BaseController
      */
     public function orders(Request $request)
     {
-        $user = Auth::user()->id;
+        $user = auth('sanctum')->user()->id;
         $stores = DB::select("
             SELECT id FROM stores WHERE vendor_id = $user
             AND deleted_at IS NULL
@@ -77,7 +77,7 @@ class StatisticController extends BaseController
     			INNER JOIN items ON items.id = orders.item_id
     			WHERE orders.status = 5 -- delivered
                 $storeQuery
-    			AND orders.deleted_at IS NULL
+                AND orders.deleted_at IS NULL
     			GROUP BY orders.item_id;
         	");
         }
@@ -92,7 +92,7 @@ class StatisticController extends BaseController
      */
     public function totalSales(Request $request)
     {
-        $user = Auth::user()->id;
+        $user = auth('sanctum')->user()->id;
         $stores = DB::select("
             SELECT id FROM stores WHERE vendor_id = $user
             AND deleted_at IS NULL
@@ -127,7 +127,7 @@ class StatisticController extends BaseController
      */
     public function totalOrders(Request $request)
     {
-        $user = Auth::user()->id;
+        $user = auth('sanctum')->user()->id;
         $stores = DB::select("
             SELECT id FROM stores WHERE vendor_id = $user
             AND deleted_at IS NULL
@@ -144,9 +144,9 @@ class StatisticController extends BaseController
         if ($storeQuery) {
         	$totalOrders = DB::select("
         		SELECT
-        		IFNULL(SUM(orders.quantity), 0) AS total
+        		IFNULL(COUNT(orders.quantity), 0) AS total
     			FROM orders
-    			WHERE orders.status = 5 -- delivered
+    			WHERE orders.status <> 1 -- not cart
                 $storeQuery
     			AND orders.deleted_at IS NULL;
         	")[0]->total;
@@ -162,7 +162,7 @@ class StatisticController extends BaseController
      */
     public function ordersPerStatus(Request $request)
     {
-        $user = Auth::user()->id;
+        $user = auth('sanctum')->user()->id;
         $stores = DB::select("
             SELECT id FROM stores WHERE vendor_id = $user
             AND deleted_at IS NULL
@@ -178,14 +178,20 @@ class StatisticController extends BaseController
         $ordersPerStatus = 0;
         if ($storeQuery) {
         	$ordersPerStatus = DB::select("
-        		SELECT
-        		status,
-        		IFNULL(COUNT(orders.quantity), 0) AS total
-    			FROM orders
-    			WHERE orders.status > 1 -- cart
-                $storeQuery
-    			AND orders.deleted_at IS NULL
-    			GROUP BY status;
+                SELECT
+                status,
+                IFNULL(COUNT(a.id), 0) AS total
+                FROM (
+                    SELECT
+                    status,
+                    id
+                    FROM orders
+                    WHERE orders.status > 1 -- cart
+                    $storeQuery
+                    AND orders.deleted_at IS NULL
+                    GROUP BY transaction_id
+                ) a
+    			GROUP BY a.status;
         	");
         }
 

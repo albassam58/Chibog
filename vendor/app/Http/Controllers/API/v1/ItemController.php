@@ -18,17 +18,20 @@ class ItemController extends BaseController
      */
     public function index(Request $request)
     {
-        $filters = $request->filters;
-        $search = [
-            'query' => null,
-            'columns' => []
-        ];
+        try {
+            $params = $request->all();
+            $searchColumns = ['name'];
+            
+            $query = new Item();
+            $query = $query->whereHas('store', function($q) {
+                $q->where('vendor_id', auth('sanctum')->user()->id);
+            })->with(['store']);
+            $items = $this->applySearch($query, $params, $searchColumns);
 
-        $query = new Item();
-        $query = $query->with(['store', 'foodType', 'cuisine'])->orderBy('meal', 'ASC');
-        $items = $this->applySearch($query, $search, $filters);
-
-        return $this->sendResponse($items);
+            return $this->sendResponse($items);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 
     /**
@@ -49,6 +52,16 @@ class ItemController extends BaseController
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'store_id'      => 'required|integer',
+            'name'          => 'required|string',
+            'description'   => 'required|string',
+            'image'         => 'required|file|mimetypes:image/jpeg,image/png,image/tiff,image/bmp,image/webp|max:1000',
+            'dish'          => 'required|integer',
+            'amount'        => 'required|numeric',
+            'status'        => 'required|integer',
+        ]);
+
         try {
             $limit = 15;
 
@@ -58,23 +71,25 @@ class ItemController extends BaseController
 
             $item = Item::create($request->except('image'));
 
-            $directory = public_path('items/' . $item->id);
+            if ($request->hasFile('image')) {
+                $directory = public_path('items/' . $item->id);
 
-            // delete all files
-            recursiveDelete($directory);
+                // delete all files
+                recursiveDelete($directory);
 
-            $image = $request->file('image');
+                $image = $request->file('image');
 
-            // initialize directory again to create folders
-            $directory = public_path('items/' . $item->id);
-            $fileName = time() . '.' . $request->image->getClientOriginalExtension();
+                // initialize directory again to create folders
+                $directory = public_path('items/' . $item->id);
+                $fileName = time() . '.' . $request->image->getClientOriginalExtension();
 
-            resizeAndSave($image, $directory, $fileName, 150, 150);
+                resizeAndSave($image, $directory, $fileName, 150, 150);
 
-            $filePath = "items/" . $item->id . "/" . $fileName;
-            $item->update([
-                'image' => $filePath
-            ]);
+                $filePath = "items/" . $item->id . "/" . $fileName;
+                $item->update([
+                    'image' => $filePath
+                ]);
+            }
 
             return $this->sendResponse($item);
         } catch(\Exception $e) {
@@ -111,10 +126,26 @@ class ItemController extends BaseController
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Item $item)
+    public function update(Request $request, $id)
     {
+        $request->validate([
+            'store_id'      => 'sometimes|required|integer',
+            'name'          => 'sometimes|required|string',
+            'description'   => 'sometimes|required|string',
+            'image'         => 'sometimes|required|file|mimetypes:image/jpeg,image/png,image/tiff,image/bmp,image/webp|max:1000',
+            'dish'          => 'sometimes|required|integer',
+            'amount'        => 'sometimes|required|numeric',
+            'status'        => 'sometimes|required|integer',
+        ]);
+
         try {
-            $item->update($request->except('image'));
+            $item = Item::whereHas('store', function($query) {
+                $query->where('vendor_id', auth('sanctum')->user()->id);
+            })->find($id);
+
+            if (!$item) throw new \Exception("No item found.");
+
+            $item->update($request->except(['id', 'image']));
 
             if ($request->hasFile('image')) {
                 $directory = public_path('items/' . $item->id);

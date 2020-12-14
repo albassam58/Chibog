@@ -19,7 +19,7 @@ class VendorIsVerified
     {
         $vendor = auth('sanctum')->user();
 
-        if ($vendor->email_verified_at) {
+        if ($vendor->email_verified_at && $vendor->mobile_verified_at) {
             return $next($request);
         }
 

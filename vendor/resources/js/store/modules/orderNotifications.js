@@ -73,7 +73,7 @@ const mutations = {
 		state.totalUnread = total;
 	},
 	setCurrentPage(state, page) {
-        state.orders.current_page = page;
+        state.orderNotifications.current_page = page;
     },
     setParams(state, params) {
         state.params = { ...state.params, ...params };

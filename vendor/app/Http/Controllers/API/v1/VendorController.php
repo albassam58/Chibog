@@ -3,20 +3,14 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\v1\BaseController;
-use App\Http\Controllers\SendMailController;
+use App\Models\Otp;
 use App\Models\Vendor;
+use App\Notifications\EmailVerification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class VendorController extends BaseController
 {
-    protected $mailController;
-
-    public function __construct(SendMailController $mailController)
-    {
-        $this->mailController = $mailController;
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -100,9 +94,78 @@ class VendorController extends BaseController
      * @param  \App\Models\Vendor  $vendor
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Vendor $vendor)
+    public function update(Request $request)
     {
-        //
+        $id = auth('sanctum')->user()->id;
+
+        $request->validate([
+            'first_name'    => 'sometimes|required|string',
+            'last_name'     => 'sometimes|required|string',
+            'mobile_number' => 'sometimes|required|string',
+            'email'         => "sometimes|required|email|unique:vendors,email,$id",
+            'region'        => 'sometimes|required|string',
+            'province'      => 'sometimes|required|string',
+            'city'          => 'sometimes|required|string',
+            'barangay'      => 'sometimes|required|string',
+            'street'        => 'sometimes|required|string',
+            'password'      => 'sometimes|required|min:8|confirmed'
+        ]);
+
+        try {
+            $vendor = Vendor::find($id);
+
+            if ($request->has('password')) {
+                $vendor->update([
+                    'password' => bcrypt($request->password)
+                ]);
+            }
+
+            $vendor->update($request->except(['password', 'password_confirmation']));
+
+            // remove email_verified_at
+            // send a verification email
+            if ($request->has('email')) {
+                $vendor->update([
+                    'email_verified_at' => null
+                ]);
+
+                $vendor->notify(new EmailVerification);
+            }
+
+            // remove mobile_verified_at
+            // send an OTP
+            if ($request->has('mobile_number')) {
+                $vendor->update([
+                    'mobile_verified_at' => null
+                ]);
+
+                $otp = generateNumericOTP();
+
+                // save otp
+                Otp::create([
+                    'mobile_number' => $request->mobile_number,
+                    'otp'           => $otp
+                ]);
+
+                // send OTP
+                $params = array(
+                    '1' => $request->mobile_number,
+                    '2' => "Your OTP is: $otp",
+                    '3' => "TR-ALBAS828316_X26FZ",
+                    'passwd' => 'tc$pe]!bxw'
+                );
+
+                $result = sendSMS($params);
+
+                if ($result != 0) {
+                    throw new \Exception("Error Num $result was encountered!");
+                }
+            }
+
+            return $this->sendResponse($vendor);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 
     /**
@@ -166,9 +229,17 @@ class VendorController extends BaseController
      * @param  string   $email
      * @return \Illuminate\Http\Response
      */
-    public function resend($id, $email)
+    public function resend(Request $request)
     {
+        $request->validate([
+            'id' => 'required|integer',
+            'email' => 'required|email',
+        ]);
+
         try {
+            $id = $request->id;
+            $email = $request->email;
+
             $vendor = Vendor::where('id', $id)->where('email', $email)->first();
 
             if (!$vendor) {
@@ -179,26 +250,7 @@ class VendorController extends BaseController
                 return $this->sendError("Email is already verified!", [], 422);
             }
 
-            $emailVerificationUrl = $vendor->createEmailVerificationUrl();
-
-            // send verification email
-            $details = [
-                'subject' => 'Chibog - Email Verification',
-                'data' => [
-                    'first_name' => $vendor->first_name,
-                    'url' => $emailVerificationUrl
-                ]
-            ];
-
-            $data = [
-                'job'       => '\App\Jobs\SendVerificationEmail',
-                'to'        => $vendor->email,
-                'cc'        => null,
-                'bcc'       => null,
-                'details'   => $details,
-            ];
-
-            $this->mailController->sendMail($data);
+            $vendor->notify(new EmailVerification($vendor));
 
             return $this->sendResponse("Email verification is successfully resent.");
         } catch (\Exception $e) {

@@ -7,11 +7,8 @@
                 <v-col
                     cols="12"
                     sm="8"
-                    md="4"
+                    md="6"
                 >
-                    <v-alert type="error" v-if="!isLoggedIn">
-                        Invalid username or password
-                    </v-alert>
                     <v-card class="elevation-12">
                         <v-toolbar
                             color="primary"
@@ -24,29 +21,58 @@
                         <v-card-text>
                             <!-- <v-btn href="/auth/facebook" color="primary">Login with Facebook</v-btn> -->
                             <v-form>
-                                <v-text-field
-                                    label="Login"
-                                    name="login"
-                                    prepend-icon="mdi-account"
-                                    type="email"
-                                    v-model="form.email"
-                                    @keyup.enter="login"
-                                ></v-text-field>
+                                <v-row>
+                                    <v-col cols="12">
+                                        <v-text-field
+                                            label="Email"
+                                            name="email"
+                                            prepend-icon="mdi-account"
+                                            type="email"
+                                            v-model="form.email"
+                                            @keyup.enter="login"
+                                            autofocus
+                                        ></v-text-field>
+                                    </v-col>
+                                </v-row>
 
-                                <v-text-field
-                                    id="password"
-                                    label="Password"
-                                    name="password"
-                                    prepend-icon="mdi-lock"
-                                    type="password"
-                                    v-model="form.password"
-                                    @keyup.enter="login"
-                                ></v-text-field>
+                                <v-row>
+                                    <v-col cols="12">
+                                        <v-text-field
+                                            id="password"
+                                            label="Password"
+                                            name="password"
+                                            prepend-icon="mdi-lock"
+                                            type="password"
+                                            v-model="form.password"
+                                            @keyup.enter="login"
+                                        ></v-text-field>
+                                    </v-col>
+                                </v-row>
+
+                                <v-row>
+                                    <v-col cols="12" sm="12" class="d-flex">
+                                        <div>
+                                            <v-checkbox
+                                                class="mt-0"
+                                                v-model="form.remember_me"
+                                                label="Keep me signed in"
+                                            ></v-checkbox>
+                                        </div>
+                                        <div class="ml-auto">
+                                            <router-link to="/forgot-password" color="primary">Forgot Password?</router-link>
+                                        </div>
+                                    </v-col>
+                                </v-row>
                             </v-form>
                         </v-card-text>
                         <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="primary" @click="login">Login</v-btn>
+                            <v-spacer />
+                            <v-btn
+                                :disabled="disabled"
+                                color="primary"
+                                @click="login"
+                                class="px-12 mb-2 mr-2"
+                            >Login</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-col>
@@ -61,6 +87,7 @@
 	export default {
 		data: () => ({
             form: {},
+            disabled: false,
             isLoggedIn: true
         }),
         computed: {
@@ -74,9 +101,12 @@
             async login() {
                 let vm = this;
                 try {
+                    vm.disabled = true;
+
                     await vm.loginVendor(vm.form);
                     window.location.href = "/";
                 } catch (err) {
+                    vm.disabled = false;
                     vm.form.password = "";
                     vm.isLoggedIn = false;
                 }

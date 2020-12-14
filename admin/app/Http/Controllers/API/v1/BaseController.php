@@ -39,7 +39,7 @@ class BaseController extends Controller
 		}
 
 		// paginate if there's items per page
-		if ($options['itemsPerPage'] > 0)
+		if (isset($options['itemsPerPage']) && $options['itemsPerPage'] > 0)
 		{
 			return $builder->paginate($options['itemsPerPage']);
 		}
@@ -138,7 +138,7 @@ class BaseController extends Controller
 			$response['data'] = $errorMessages;
 		}
 
-		Log::error(json_encode($response));
+		Log::error("Manual Error Logging: " . json_encode($response));
 
 		return response()->json($response, $code);
 	}

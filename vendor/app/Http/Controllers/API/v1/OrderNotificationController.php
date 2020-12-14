@@ -27,11 +27,12 @@ class OrderNotificationController extends BaseController
     public function vendor(Request $request)
     {
         try {
-            $vendorId = Auth::user()->id;
-            $query = new OrderNotification();
-            $query = $query->where('channel', 'order-' . $vendorId);
+            $params = $request->all();
 
-            $orderNotifications = $this->applySearch($query);
+            $query = new OrderNotification();
+            $query = $query->where('channel', 'order-' . auth('sanctum')->user()->id);
+
+            $orderNotifications = $this->applySearch($query, $params);
 
             return $this->sendResponse($orderNotifications);
         } catch (\Exception $e) {
@@ -47,7 +48,7 @@ class OrderNotificationController extends BaseController
     public function popup(Request $request)
     {
         try {
-            $vendorId = Auth::user()->id;
+            $vendorId = auth('sanctum')->user()->id;
             $orderNotifications = OrderNotification::where('channel', 'order-' . $vendorId)->limit(5)->get();
 
             return $this->sendResponse($orderNotifications);
@@ -64,7 +65,7 @@ class OrderNotificationController extends BaseController
     public function countUnread()
     {
         try {
-            $vendorId = Auth::user()->id;
+            $vendorId = auth('sanctum')->user()->id;
             $count = OrderNotification::where('channel', 'order-' . $vendorId)->where('status', 1)->count();
 
             return $this->sendResponse($count);
@@ -103,7 +104,7 @@ class OrderNotificationController extends BaseController
     public function show($id)
     {
         try {
-            $vendorId = Auth::user()->id;
+            $vendorId = auth('sanctum')->user()->id;
             $orderNotification = OrderNotification::where('channel', 'order-' . $vendorId)->where('id', $id)->first();
 
             if ($orderNotification) {
@@ -165,7 +166,7 @@ class OrderNotificationController extends BaseController
         try {
             $ids = explode(",", $ids);
 
-            $vendorId = Auth::user()->id;
+            $vendorId = auth('sanctum')->user()->id;
             OrderNotification::whereIn('id', $ids)->where('channel', 'order-' . $vendorId)->update([
                 'status' => 2, // read
             ]);
@@ -187,7 +188,7 @@ class OrderNotificationController extends BaseController
         try {
             $ids = explode(",", $ids);
 
-            $vendorId = Auth::user()->id;
+            $vendorId = auth('sanctum')->user()->id;
             OrderNotification::whereIn('id', $ids)->where('channel', 'order-' . $vendorId)->delete();
 
             $this->sendResponse();

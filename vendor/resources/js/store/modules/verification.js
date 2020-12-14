@@ -1,30 +1,24 @@
 const state = {
-	verification: {},
+	verification: null,
 	resent: null,
 };
 const getters = {};
 const actions = {
 	async verify({ commit }, url) {
 		try {
-			let { data } = await axios.get(url);
-
-			let vendor = JSON.parse(localStorage.getItem('current_vendor'));
-			if (vendor) {
-				vendor.email_verified_at = new Date().toJSON().slice(0,19).replace(/T/g,' ');
-				localStorage.setItem('current_vendor', JSON.stringify(vendor));
-			}
+			let { data } = await axios.get(url, { toasterError: false });
 			commit('setVerification', data);
 		} catch (err) {
-			commit('setVerification', err.response.data);
+			commit('setVerification', err.response ? err.response.data : err.statusText);
 			throw err;
 		}
 	},
-	async resend({ commit }, { id, email }) {
+	async resend({ commit }, form) {
 		try {
-			let { data } = await axios.get(`/v1/vendor/resend/${ id }/${ email }`);
+			let { data } = await axios.post('/v1/vendor/resend', form, { toasterMessage: 'Email verification is successfully resent.' });
 			commit('setResent', data.data);
 		} catch (err) {
-			commit('setResent', err.response ? err.response.data : err.message);
+			commit('setResent', err.response ? err.response.data.message : err.statusText);
 			throw err;
 		}
 	}

@@ -11,11 +11,10 @@ const getters = {
 
 };
 const actions = {
-	async fetch({ commit }) {
+	async fetch({ commit }, params) {
 		try {
-			let params = this._vm.$serialize(state.params);
 			let { data } = await axios.get(`/v1/items?${ params }`);
-			commit('setItems', data.data);
+			commit('SET_ITEMS', data.data);
 		} catch (err) {
 			throw err;
 		}
@@ -23,7 +22,7 @@ const actions = {
 	async find({ commit }, id) {
 		try {
 			let { data } = await axios.get('/v1/items', id);
-			commit('setItem', data.data);
+			commit('SET_ITEM', data.data);
 		} catch (err) {
 			throw err;
 		}
@@ -31,7 +30,7 @@ const actions = {
 	async save({ commit }, form) {
 		try {
 			let { data } = await axios.post('/v1/items', form);
-			commit('setItem', data.data);
+			commit('SET_ITEM', data.data);
 		} catch (err) {
 			throw err;
 		}
@@ -46,26 +45,20 @@ const actions = {
 				}
 			}
 
-			let { data } = await axios.post(`/v1/items/${ id }`, form);
-			commit('setItem', data.data);
+			let { data } = await axios.post(`/v1/items/${ id }`, form, { toasterMessage: 'Successfully updated!' });
+			commit('SET_ITEM', data.data);
 		} catch (err) {
 			throw err;
 		}
 	}
 };
 const mutations = {
-	setItems(state, items) {
+	SET_ITEMS(state, items) {
 		state.items = items;
 	},
-	setItem(state, item) {
+	SET_ITEM(state, item) {
 		state.item = item;
-	},
-	setCurrentPage(state, page) {
-        state.orders.current_page = page;
-    },
-    setParams(state, params) {
-        state.params = { ...state.params, ...params };
-    },
+	}
 };
 
 export default {

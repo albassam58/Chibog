@@ -40,7 +40,6 @@ class RegisterController extends BaseController
 	        $create['city'] = $request->city;
 	        $create['barangay'] = $request->barangay;
 	        $create['street'] = $request->street;
-	        $create['social_media'] = $request->social_media;
 	        $create['status'] = 2;
 
 	        $vendorModel = new Vendor;

@@ -17,58 +17,19 @@ class StoreController extends BaseController
      */
     public function index(Request $request)
     {
-        $stores = new Store();
+        try {
+            $params = $request->all();
+            $searchColumns = ['name'];
 
-        if ($request->exclude) {
-            $stores = $stores->withCount('reviews')->where('city', '<>', $request->exclude);
+            $query = new Store();
+            $query = $query->where('vendor_id', auth('sanctum')->user()->id)->withCount('reviews')->with('vendor');
+
+            $store = $this->applySearch($query, $params, $searchColumns);
+
+            return $this->sendResponse($store);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
         }
-
-        return $stores->paginate(50);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  string  $query
-     * @return \Illuminate\Http\Response
-     */
-    public function search($query)
-    {
-        $stores = new Store();
-
-        if ($query) {
-            $stores = $stores->where(function($q) use($query) {
-                $q->where('name', 'LIKE', "%$query%")
-                ->orWhere('region', 'LIKE', "%$query%")
-                ->orWhere('province', 'LIKE', "%$query%")
-                ->orWhere('city', 'LIKE', "%$query%")
-                ->orWhere('barangay', 'LIKE', "%$query%")
-                ->orWhere('street', 'LIKE', "%$query%");
-            });
-        }
-
-        return $stores->paginate(50);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function vendor()
-    {
-        return Store::where('vendor_id', Auth::user()->id)->withCount('reviews')->with('vendor')->paginate(50);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  string  $city
-     * @return \Illuminate\Http\Response
-     */
-    public function city($city)
-    {
-        return Store::where('city', $city)->paginate(50);
     }
 
     /**
@@ -89,20 +50,57 @@ class StoreController extends BaseController
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'name'              => 'required|string',
+            'description'       => 'required|string',
+            'logo'              => 'required|file|mimetypes:image/jpeg,image/png,image/tiff,image/bmp,image/webp|max:2000',
+            'social_media'      => 'required|url',
+            'region'            => 'required|string',
+            'province'          => 'required|string',
+            'city'              => 'required|string',
+            'barangay'          => 'required|string',
+            'street'            => 'required|string',
+            'type'              => 'required|integer',
+            'schedule_day'      => 'required|string',
+            'schedule_time_in'  => 'required|date_format:H:i',
+            'schedule_time_out' => 'required|date_format:H:i'
+        ]);
+
         try {
             $limit = 1;
 
-            $countStores = Store::where('vendor_id', auth('sanctum')->user()->id)->count();
+            // rejected is not counted
+            $countStores = Store::where('status', '<>', 3)->where('vendor_id', auth('sanctum')->user()->id)->count();
 
             if ($countStores >= $limit) throw new \Exception("Store limit exceeded. You are only allowed to make $limit store per vendor.");
 
             $request->merge([
                 'vendor_id'       => Auth::user()->id,
-                'schedule_day'  => implode(',', $request->schedule_day),
                 'status'        => 1
             ]);
 
-            $store = Store::create($request->all());
+            $store = Store::create($request->except('logo'));
+
+            if ($request->hasFile('logo')) {
+                $directory = public_path('stores/' . $store->id);
+
+                // delete all files
+                recursiveDelete($directory);
+
+                $image = $request->file('logo');
+
+                // initialize directory again to create folders
+                $directory = public_path('stores/' . $store->id);
+
+                $fileName = time() . '.' . $request->logo->getClientOriginalExtension();
+
+                resizeAndSave($image, $directory, $fileName, 500, 500);
+
+                $filePath = "stores/" . $store->id . "/" . $fileName;
+                $store->update([
+                    'logo' => $filePath
+                ]);
+            }
 
             return $this->sendResponse($store);
         } catch (\Exception $e) {
@@ -119,7 +117,7 @@ class StoreController extends BaseController
     public function show($id)
     {
         try {
-            $store = Store::withCount('reviews')->with('vendor')->find($id);//->->first();
+            $store = Store::where('vendor_id', auth('sanctum')->user()->id)->withCount('reviews')->with('vendor')->find($id);
             return $this->sendResponse($store);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
@@ -144,13 +142,53 @@ class StoreController extends BaseController
      * @param  \App\Models\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Store $store)
+    public function update(Request $request, $id)
     {
+        $request->validate([
+            'name'              => 'sometimes|required|string',
+            'description'       => 'sometimes|required|string',
+            'logo'              => 'sometimes|file|mimetypes:image/jpeg,image/png,image/tiff,image/bmp,image/webp|max:2000',
+            'social_media'      => 'sometimes|required|url',
+            'region'            => 'sometimes|required|string',
+            'province'          => 'sometimes|required|string',
+            'city'              => 'sometimes|required|string',
+            'barangay'          => 'sometimes|required|string',
+            'street'            => 'sometimes|required|string',
+            'type'              => 'sometimes|required|integer',
+            'schedule_day'      => 'sometimes|required|string',
+            'schedule_time_in'  => 'sometimes|required|date_format:H:i',
+            'schedule_time_out' => 'sometimes|required|date_format:H:i',
+            'status'            => 'sometimes|required|integer',
+        ]);
+
         try {
-            $request->merge([
-                'schedule_day'  => implode(',', $request->schedule_day)
-            ]);
-            $store->update($request->except(['id', 'picture', 'vendor', 'reviews_count', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at']));
+            $store = Store::withCount('reviews')->with('vendor')->where('vendor_id', auth('sanctum')->user()->id)->find($id);
+
+            if (!$store) throw new \Exception("No store found.");
+
+            $store->update($request->except(['id', 'logo']));
+
+            if ($request->hasFile('logo')) {
+                $directory = public_path('stores/' . $store->id);
+
+                // delete all files
+                recursiveDelete($directory);
+
+                $image = $request->file('logo');
+
+                // initialize directory again to create folders
+                $directory = public_path('stores/' . $store->id);
+
+                $fileName = time() . '.' . $request->logo->getClientOriginalExtension();
+
+                resizeAndSave($image, $directory, $fileName, 500, 500);
+
+                $filePath = "stores/" . $store->id . "/" . $fileName;
+                $store->update([
+                    'logo' => $filePath
+                ]);
+            }
+            
             return $this->sendResponse($store);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
@@ -166,61 +204,5 @@ class StoreController extends BaseController
     public function destroy(Store $store)
     {
         //
-    }
-
-    /**
-     * Upload a file in the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function upload(Request $request)
-    {
-        try {
-            $storeId = $request->store_id;
-            $directory = public_path('stores/' . $storeId);
-
-            // delete all files
-            recursiveDelete($directory);
-
-            $image = $request->file('file');
-
-            // initialize directory again to create folders
-            $directory = public_path('stores/' . $storeId);
-            $fileName = time() . '.' . $request->file->getClientOriginalExtension();
-
-            resizeAndSave($image, $directory, $fileName, 500, 500);
-
-            $filePath = "stores/" . $storeId . "/" . $fileName;
-
-            $store = Store::find($storeId);
-            $store->update([
-                'logo' => $filePath
-            ]);
-
-            return $this->sendResponse($store);
-        } catch (\Error $e) {
-            return $this->sendError($e->getMessage());
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
-
-    /**
-     * Delete a file or recursively delete a directory
-     *
-     * @param string $str Path to file or directory
-     */
-    public function recursiveDelete($str)
-    {
-        if (is_file($str)) {
-            return @unlink($str);
-        } else if (is_dir($str)) {
-            $scan = glob(rtrim($str,'/') . '/*');
-            foreach($scan as $index=>$path) {
-                $this->recursiveDelete($path);
-            }
-            return @rmdir($str);
-        }
     }
 }

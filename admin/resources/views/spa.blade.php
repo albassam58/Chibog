@@ -16,6 +16,12 @@
 
         <!-- CSS -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+        <style type="text/css">
+            .toaster-font {
+                font-family: Roboto,sans-serif !important;
+            }
+        </style>
     </head>
     <body>
         <div id="app"></div>

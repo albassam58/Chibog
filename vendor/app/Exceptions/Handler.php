@@ -39,7 +39,7 @@ class Handler extends ExceptionHandler
                 return response()->json([
                     'success'   => false,
                     'data'      => [],
-                    'message'   => "Either vendor is already verified or invalid/expired link."
+                    'message'   => "Either vendor is already verified, invalid, or expired link."
                 ], 403);
             }
         });
