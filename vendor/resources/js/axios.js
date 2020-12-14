@@ -75,7 +75,13 @@ request.interceptors.response.use(function (response) {
         return;
     } else if (error.response.status == 422 && toaster) {
         // validate error
-        Vue.toasted.show(error.response.data.message, {
+        let message = error.response.data.message;
+        let errors = error.response.data.errors;
+        for(let index in errors) {
+            message = errors[index][0];
+        }
+
+        Vue.toasted.show(message, {
             action: {
                 icon: 'close',
                 iconPack: 'mdi',

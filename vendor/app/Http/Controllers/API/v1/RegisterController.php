@@ -4,7 +4,10 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\v1\BaseController;
 use App\Http\Controllers\SendMailController;
+use App\Jobs\SendOtp;
+use App\Models\Otp;
 use App\Models\Vendor;
+use App\Notifications\EmailVerification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,15 +23,23 @@ class RegisterController extends BaseController
 
 	public function register(Request $request)
 	{
-		// $request->validate([
-		// 	'first_name' => 'required|string',
-		// 	'last_name' => 'required|string',
-		// 	'email' => 'required|email',
-		// 	'password' => 'required|confirmed|min:6',
-		// ]);
+		$request->validate([
+			'first_name' 	=> 'required|string',
+			'last_name' 	=> 'required|string',
+			'mobile_number' => 'required|string',
+			'email' 		=> 'required|email|unique:vendors,email',
+			'region'        => 'required|string',
+            'province'      => 'required|string',
+            'city'          => 'required|string',
+            'barangay'      => 'required|string',
+            'street'        => 'required|string',
+            'password'      => 'required|min:8|confirmed'
+		]);
 
 		try {
 			DB::beginTransaction();
+
+			$request->mobile_number = str_replace("+63", "0", $request->mobile_number);
 
 			$create['first_name'] = $request->first_name;
 	        $create['last_name'] = $request->last_name;
@@ -45,33 +56,36 @@ class RegisterController extends BaseController
 	        $vendorModel = new Vendor;
 	        $vendor = $vendorModel->addNew($create);
 
-	        $emailVerificationUrl = $vendor->createEmailVerificationUrl();
+	        $credentials = $request->only('email', 'password');
 
-	        // send verification email
-	        $details = [
-	        	'subject' => 'Chibog - Email Verification',
-	        	'data' => [
-	        		'first_name' => $vendor->first_name,
-	        		'url' => $emailVerificationUrl
-	        	]
-	        ];
+	        Auth::loginUsingId($vendor->id);
 
-	        $data = [
-	        	'job' 		=> '\App\Jobs\SendVerificationEmail',
-	        	'to'		=> $vendor->email,
-	        	'cc'		=> null,
-	        	'bcc'		=> null,
-	        	'details'	=> $details,
-	        ];
+            $otp = generateNumericOTP();
 
-	        $this->mailController->sendMail($data);
+            // save otp
+            Otp::create([
+                'mobile_number' => $request->mobile_number,
+                'otp'           => $otp
+            ]);
 
-	        DB::commit();
+            // send OTP
+            $params = array(
+                '1' => $request->mobile_number,
+                '2' => "Your OTP is: $otp",
+                '3' => "TR-ALBAS828316_X26FZ",
+                'passwd' => 'tc$pe]!bxw'
+            );
+
+            SendOtp::dispatch($params)->onQueue('sms');
+
+            DB::commit();
 
 	        return $this->sendResponse($vendor);
 	    } catch (\Exception $e) {
+	    	DB::rollBack();
 	    	return $this->sendError($e->getMessage());
 	    } catch (\Error $e) {
+	    	DB::rollBack();
 	    	return $this->sendError($e->getMessage());
 	    }
 	}

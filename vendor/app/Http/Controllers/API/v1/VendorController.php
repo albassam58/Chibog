@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\v1\BaseController;
+use App\Jobs\SendOtp;
 use App\Models\Otp;
 use App\Models\Vendor;
 use App\Notifications\EmailVerification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class VendorController extends BaseController
 {
@@ -112,11 +114,19 @@ class VendorController extends BaseController
         ]);
 
         try {
+            DB::beginTransaction();
+
             $vendor = Vendor::find($id);
 
             if ($request->has('password')) {
                 $vendor->update([
                     'password' => bcrypt($request->password)
+                ]);
+            }
+
+            if ($request->has('mobile_number')) {
+                $request->merge([
+                    'mobile_number' => str_replace("+63", "0", $request->mobile_number)
                 ]);
             }
 
@@ -155,15 +165,14 @@ class VendorController extends BaseController
                     'passwd' => 'tc$pe]!bxw'
                 );
 
-                $result = sendSMS($params);
-
-                if ($result != 0) {
-                    throw new \Exception("Error Num $result was encountered!");
-                }
+                SendOtp::dispatch($params)->onQueue('sms');
             }
+
+            DB::commit();
 
             return $this->sendResponse($vendor);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->sendError($e->getMessage());
         }
     }
@@ -237,6 +246,8 @@ class VendorController extends BaseController
         ]);
 
         try {
+            DB::beginTransaction();
+
             $id = $request->id;
             $email = $request->email;
 
@@ -250,10 +261,13 @@ class VendorController extends BaseController
                 return $this->sendError("Email is already verified!", [], 422);
             }
 
-            $vendor->notify(new EmailVerification($vendor));
+            $vendor->notify(new EmailVerification);
+
+            DB::commit();
 
             return $this->sendResponse("Email verification is successfully resent.");
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->sendError($e->getMessage());
         }
     }

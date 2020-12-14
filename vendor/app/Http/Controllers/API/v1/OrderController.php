@@ -188,6 +188,8 @@ class OrderController extends BaseController
         ]);
 
         try {
+            DB::beginTransaction();
+
             $transactionId = $request->transactionId;
             $status = $request->status;
 
@@ -209,8 +211,11 @@ class OrderController extends BaseController
             })->where('transaction_id', $transactionId)->first();
             $order->notify(new UpdateOrderStatus);
 
+            DB::commit();
+
             return $this->sendResponse($orders);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->sendError($e->getMessage());
         }
     }
@@ -224,6 +229,8 @@ class OrderController extends BaseController
     public function updatePaid($transactionId)
     {
         try {
+            DB::beginTransaction();
+
             $query = new Order();
             $query = $query->whereHas('store', function($q) {
                 $q->where('vendor_id', auth('sanctum')->user()->id);
@@ -242,8 +249,11 @@ class OrderController extends BaseController
             })->where('transaction_id', $transactionId)->first();
             $order->notify(new OrderPaid);
 
+            DB::commit();
+
             return $this->sendResponse($orders);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->sendError($e->getMessage());
         }
     }

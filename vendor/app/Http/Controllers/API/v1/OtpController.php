@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\v1\BaseController;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendOtp;
 use App\Models\Otp;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OtpController extends BaseController
 {
@@ -99,6 +101,10 @@ class OtpController extends BaseController
         ]);
 
         try {
+            DB::beginTransaction();
+
+            $request->mobile_number = str_replace("+63", "0", $request->mobile_number);
+
             $vendor = Vendor::where('id', auth('sanctum')->user()->id)->where('mobile_number', $request->mobile_number)->first();
 
             if (!$vendor) {
@@ -125,14 +131,13 @@ class OtpController extends BaseController
                 'passwd' => 'tc$pe]!bxw'
             );
 
-            $result = sendSMS($params);
+            SendOtp::dispatch($params)->onQueue('sms');
 
-            if ($result != 0) {
-                throw new \Exception("Error Num $result was encountered!");
-            }
+            DB::commit();
 
             return $this->sendResponse($vendor);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->sendError($e->getMessage());
         }
     }
@@ -151,6 +156,10 @@ class OtpController extends BaseController
         ]);
 
         try {
+            DB::beginTransaction();
+
+            $request->mobile_number = str_replace("+63", "0", $request->mobile_number);
+
             $otp = Otp::where('mobile_number', $request->mobile_number)->where('otp', $request->otp)->first();
 
             // OTP not found
@@ -179,8 +188,11 @@ class OtpController extends BaseController
             // delete all generated OTPs for mobile number
             Otp::where('mobile_number', $request->mobile_number)->delete();
 
+            DB::commit();
+
             return $this->sendResponse($otp);
         } catch (\Exception $e) {
+            DB::rollBack();
             $code = 500;
             if ($e->getCode()) $code = $e->getCode();
             return $this->sendError($e->getMessage(), null, $code);

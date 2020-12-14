@@ -34,14 +34,15 @@ const actions = {
 	},
 	async registerVendor({commit}, vendor) {
 		try {
-			await axios.post('/v1/vendor/register', vendor);
+			await axios.post('/v1/vendor/register', vendor, { toasterMessage: "Successfully registered!" });
+			localStorage.setItem('authenticated', true);
 		} catch (err) {
 			throw err;
 		}
 	},
 	async forgotPassword({ commit }, form) {
 		try {
-			await axios.post('/v1/vendor/forgot-password', form, { toasterMessage: "Email successfully sent!"});
+			await axios.post('/v1/vendor/forgot-password', form, { toasterMessage: "Email successfully sent!" });
 		} catch (err) {
 			throw err;
 		}

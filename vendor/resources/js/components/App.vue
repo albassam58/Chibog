@@ -15,7 +15,7 @@
                     </router-link>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <div v-if="authenticated && vendor.email_verified_at">
+                <div v-if="authenticated && vendor.email_verified_at && vendor.mobile_verified_at">
                     <order-notification ref="orderNotificationRef"></order-notification>
                 </div>
                 <div>
