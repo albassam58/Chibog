@@ -13,7 +13,7 @@
 			<v-row>
 				<v-col cols="12" sm="12" md="6">
 					<v-card>
-						<v-card-title>Total Sales</v-card-title>
+						<v-card-title>Total Delivered Sales</v-card-title>
 						<v-card-text>
 							{{ totalSales.toFixed(2) }}
 						</v-card-text>
@@ -41,14 +41,14 @@
 			</v-row>
 
 			<v-card class="mt-4">
-				<v-card-title>Sales</v-card-title>
+				<v-card-title>Sales (Delivered)</v-card-title>
 				<v-card-text>
 					<bar-chart :chartData="salesBarChartData" :options="salesBarOptions"></bar-chart>
 				</v-card-text>
 			</v-card>
 
 			<v-card class="mt-4">
-				<v-card-title>Orders</v-card-title>
+				<v-card-title>Orders (Delivered)</v-card-title>
 				<v-card-text>
 					<bar-chart :chartData="ordersBarChartData" :options="ordersBarOptions"></bar-chart>
 				</v-card-text>

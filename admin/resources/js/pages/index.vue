@@ -79,16 +79,25 @@
         			<div class="text-caption">
         				<v-icon x-small>mdi-link</v-icon>
         				<a
-        					v-if="item.vendor.social_media"
-        					:href="item.vendor.social_media"
+        					v-if="item.social_media"
+        					:href="item.social_media"
         					target="blank"
         				>
-        					{{ item.vendor.social_media }}
+        					{{ item.social_media }}
         				</a>
         				<span v-else color="error">No link provided</span>
         			</div>
         		</td>
-        		<td>{{ item.status_value }}</td>
+        		<td>
+                    <div :class="
+                        {
+                            'grey--text': item.status == 1,
+                            'green--text': item.status == 2,
+                            'red--text': item.status == 3
+                        }
+                    ">{{ item.status_value }}</div>
+                    <div class="text-caption">{{ item.remarks }}</div>      
+                </td>
         		<td class="text-center">
         			<v-tooltip bottom v-if="item.status !== 2">
 	                    <template v-slot:activator="{ on, attrs }">
@@ -131,6 +140,18 @@
 
 	        	<v-card-text class="my-4 text-body-1">
 	          		Are you sure to {{ approvalItem.newStatus == 2 ? "approve" : "reject" }} this store?
+
+                    <v-form
+                        ref="form"
+                    >
+                        <v-textarea
+                            v-model="remarks"
+                            :rules="rules"
+                            label="Reason..."
+                            required
+                            @keyup.shift.enter="approval(approvalItem.newStatus)"
+                        ></v-textarea>
+                    </v-form>
 	        	</v-card-text>
 
 	        	<v-divider></v-divider>
@@ -165,6 +186,7 @@
 			approvalItem: {
 				newStatus: 0
 			},
+            remarks: null,
             headers: [
             	{ text: "Status", value: "status", align: ' d-none' },
             	{ text: "Picture", value: "logo" },
@@ -192,6 +214,9 @@
             	}
             ],
             filters: {},
+            rules: [
+                v => !!v || 'Field is required',
+            ],
             vendorUrl: null
         }),
         async created() {
@@ -224,13 +249,19 @@
         	async approval(newStatus) {
         		let vm = this;
 
-        		vm.approvalDialogDisable = true;
+                let valid = vm.$refs.form.validate();
+                if (valid) {
+                    vm.approvalDialogDisable = true;
 
-        		await vm.update({ id: vm.approvalItem.id, status: newStatus });
-        		vm.$refs.table.loadItems(); // reload items
+            		await vm.update({ id: vm.approvalItem.id, status: newStatus, remarks: vm.remarks });
+            		vm.$refs.table.loadItems(); // reload items
 
-        		vm.approvalDialogDisable = false;
-        		vm.approvalDialog = false;
+                    vm.remarks = null;
+                    vm.$refs.form.resetValidation();
+
+            		vm.approvalDialogDisable = false;
+            		vm.approvalDialog = false;
+                }
         	}
         }
 	}

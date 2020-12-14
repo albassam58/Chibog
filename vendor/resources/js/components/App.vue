@@ -2,7 +2,7 @@
     <v-app>
         <div>
             <v-app-bar
-                color="deep-purple accent-4"
+                color="background"
                 dense
                 dark>
                 <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
@@ -11,7 +11,7 @@
                         to="/"
                         class="white--text text-decoration-none"
                     >
-                        Chibog
+                        ENKA
                     </router-link>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
@@ -66,13 +66,13 @@
                                 {{ vendor.first_name }}
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="$router.push('/orders')">
+                        <v-list-item @click="$router.push('/orders')" v-if="vendor.email_verified_at">
                             <v-list-item-title>
                                 <v-icon>mdi-cart</v-icon>
                                 Orders
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="$router.push('/statistics')">
+                        <v-list-item @click="$router.push('/statistics')" v-if="vendor.email_verified_at">
                             <v-list-item-title>
                                 <v-icon>mdi-chart-box</v-icon>
                                 Statistics
@@ -98,25 +98,8 @@
                     >Login</router-link>
                 </span>
             </v-app-bar>
-
-            <!--  v-if="!Object.entries(vendor).length || (Object.entries(vendor).length && vendor.email_verified_at && !$route.query.queryUrl)" -->
+            
             <router-view :key="$route.fullPath" />
-
-            <!-- <div v-else-if="alreadyVerified">
-                Already verified!
-            </div>
-
-            <div v-else>
-                <div v-if="Object.entries(verification).length">
-                    Email successfully sent
-                    <v-btn @click="resendVerification">Resend</v-btn>
-                </div>
-                <div v-else>
-                    Please verify your email:
-
-                    <v-btn @click="resendVerification">Resend</v-btn>
-                </div>
-            </div> -->
         </div>
     </v-app>
 </template>
@@ -138,9 +121,9 @@
             await vm.getVendor();
 
             // check if email is verified, if not, redirect to email verification
-            if (vm.vendor && !vm.vendor.email_verified_at) {
-                if (vm.$route.path != '/email/verification') {
-                    vm.$router.push('/email/verification');
+            if (vm.vendor && (!vm.vendor.email_verified_at || !vm.vendor.mobile_verified_at)) {
+                if (vm.$route.path != '/verification' && vm.$route.path != "/vendor") {
+                    vm.$router.push('/verification');
                 }
             }
 

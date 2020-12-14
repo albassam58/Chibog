@@ -86,7 +86,7 @@
 		      		<div class="subtitle-1">
 		        		<!-- $ • Italian, Cafe -->
 		        		<v-icon>mdi-link</v-icon>
-		        		<a :href="`${ store.vendor ? store.vendor.social_media : '' }`">{{ store.vendor ? store.vendor.social_media : "" }}</a>
+		        		<a :href="`${ store.social_media }`">{{ store.social_media }}</a>
 		      		</div>
 		      		<div class="subtitle-1">
 		        		<!-- $ • Italian, Cafe -->
@@ -100,7 +100,18 @@
 
 	    	<v-divider class="mx-4"></v-divider>
 
-	    	<v-card-title>Availability</v-card-title>
+	    	<v-card-title>
+	    		Availability
+	    		<v-spacer />
+	    		<v-switch
+	              v-model="store.is_forced_closed"
+	              label="Close Store"
+	              color="error"
+	              class="mt-0"
+	              hide-details
+	              @change="openForcedClosedDialog"
+	            ></v-switch>
+	    	</v-card-title>
 
 	    	<v-card-text>
 				<div>
@@ -114,7 +125,6 @@
 					v-for="(day, index) in scheduleDay(store)"
 					:key="day.short"
 			      	:color="day.color"
-			      	:dark="day.short == 'Mon' || day.short == 'Thu' ? false : true"
 			    >
 			      	{{ day.short }}
 			    </v-chip>
@@ -139,11 +149,60 @@
 	        		Edit
 	      		</v-btn>
 	    	</v-card-actions>
+
+	    	<v-dialog
+		      	v-model="forcedClosedDialog"
+		       	@input="v => v || closeForcedClosedDialog()"
+		      	width="500"
+		    >
+		      	<v-card>
+		        	<v-card-title>
+		          		{{
+		          			store.is_forced_closed
+		          				? "Close Store"
+		          				: "Remove Close"
+		          		}}
+		        	</v-card-title>
+
+		        	<v-card-text class="my-4 text-body-1">
+		        		{{
+		        			store.is_forced_closed
+		        				? "Are you sure to close the store? It won't follow the schedule availability."
+		        				: "Are you sure to remove the forced closing of the store? It will follow the schedule availability."
+		        		}}
+		        	</v-card-text>
+
+		        	<v-divider></v-divider>
+
+		        	<v-card-actions>
+		          		<v-spacer></v-spacer>
+		          		<v-btn
+		          			color="grey"
+		          			text
+		          			@click="closeForcedClosedDialog"
+	          			>Cancel</v-btn>
+		          		<v-btn
+		            		color="primary"
+		            		text
+		            		:disabled="forcedClosedDialogDisable"
+		            		@click="updateIsForcedClosed"
+		          		>
+		          			{{
+			        			store.is_forced_closed
+			        				? "Close Store"
+			        				: "Remove Forced Closing"
+			        		}}
+		          		</v-btn>
+		        	</v-card-actions>
+		      	</v-card>
+		    </v-dialog>
+
 	 	</v-card>
 	</div>
 </template>
 
 <script type="text/javascript">
+	import { mapActions } from 'vuex'
 	import VueDropzone from 'vue2-dropzone'
 	import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 
@@ -176,6 +235,8 @@
 		data() {
 			return {
 				currentFile: {},
+				forcedClosedDialog: false,
+				forcedClosedDialogDisable: false,
 				dropzoneOptions: {
 			        url: '/api/v1/stores/upload',
 			        // autoProcessQueue: false,
@@ -207,6 +268,9 @@
 			}
 		},
 		methods: {
+			...mapActions({
+				'update': 'stores/update'
+			}),
 			fileAdded(file) {
 				let vm = this;
 
@@ -254,6 +318,15 @@
 		    isAvailable(store) {
 		    	// check if open or closed
 		    	let vm = this;
+
+		    	// check if forced closed
+		    	if (vm.store.is_forced_closed) {
+		    		return {
+						color: 'red',
+						text: 'CLOSED'
+					};
+		    	}
+
 		    	let days = store.schedule_day.split(",");
 		    	let timein = vm.$moment(store.schedule_time_in, 'h:mma');
 		    	let timeout = vm.$moment(store.schedule_time_out, 'h:mma');
@@ -276,7 +349,42 @@
 					color: 'red',
 					text: 'CLOSED'
 				};
+		    },
+		    openForcedClosedDialog() {
+		    	let vm = this;
+
+		    	vm.forcedClosedDialog = true;
+		    },
+		    closeForcedClosedDialog(e, revert = true) {
+		    	let vm = this;
+
+		    	if (revert) {
+		    		vm.store.is_forced_closed = !vm.store.is_forced_closed;
+		    	}
+
+		    	vm.forcedClosedDialog = false;
+		    },
+		    async updateIsForcedClosed() {
+		    	let vm = this;
+
+		    	try {
+			    	vm.forcedClosedDialogDisable = true;
+			    	
+			    	let formData = new FormData();
+			    	formData.append('_method', 'PUT');
+			    	formData.append('id', vm.store.id);
+			    	formData.append('is_forced_closed', vm.store.is_forced_closed ? 1 : 0);
+			    	await vm.update(formData);
+
+			    	vm.store.is_forced_closed = vm.store.is_forced_closed == 1 ? true : false
+
+			    	vm.forcedClosedDialogDisable = false;
+			    	vm.forcedClosedDialog = false;
+			    } catch(err) {
+			    	vm.forcedClosedDialogDisable = false;
+			    	vm.closeForcedClosedDialog()
+			    }
 		    }
-		},
+		}
 	}
 </script>
