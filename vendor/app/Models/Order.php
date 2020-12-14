@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
 use App\Models\BaseModel;
 
 class Order extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     /*
 		Status:
@@ -22,6 +23,18 @@ class Order extends BaseModel
     protected $appends = ['full_name', 'reversed_full_name'];
 
     protected $guarded = [];
+
+    /**
+     * Route notifications for the mail channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return array|string
+     */
+    public function routeNotificationForMail($notification)
+    {
+        // Return email address only...
+        return $this->customer_email;
+    }
 
     public function getFullNameAttribute() {
         return $this->customer_first_name . " " . $this->customer_last_name;

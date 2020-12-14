@@ -3,20 +3,15 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\v1\BaseController;
-use App\Http\Controllers\SendMailController;
 use App\Models\Order;
+use App\Notifications\OrderPaid;
+use App\Notifications\UpdateOrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends BaseController
 {
-    protected $mailController;
-
-    public function __construct(SendMailController $mailController)
-    {
-        $this->mailController = $mailController;
-    }
 
     /**
      * Display a listing of the resource.
@@ -209,25 +204,10 @@ class OrderController extends BaseController
                 'status' => $status
             ]);
 
-            // send update order status email
-            $details = [
-                'subject' => 'Chibog - ' . $orders[0]->status['name'],
-                'data' => [
-                    'first_name' => $orders[0]->customer_first_name,
-                    'transaction_id' => $transactionId,
-                    'status' => $orders[0]->status['name']
-                ]
-            ];
-
-            $data = [
-                'job'       => '\App\Jobs\SendUpdateOrderStatusEmail',
-                'to'        => $orders[0]->customer_email,
-                'cc'        => null,
-                'bcc'       => null,
-                'details'   => $details,
-            ];
-
-            $this->mailController->sendMail($data);
+            $order = Order::whereHas('store', function($q) {
+                $q->where('vendor_id', auth('sanctum')->user()->id);
+            })->where('transaction_id', $transactionId)->first();
+            $order->notify(new UpdateOrderStatus);
 
             return $this->sendResponse($orders);
         } catch (\Exception $e) {
@@ -257,24 +237,10 @@ class OrderController extends BaseController
                 'is_paid' => 1
             ]);
 
-            // send update order status email
-            $details = [
-                'subject' => 'Chibog - Paid',
-                'data' => [
-                    'first_name' => $orders[0]->customer_first_name,
-                    'transaction_id' => $transactionId
-                ]
-            ];
-
-            $data = [
-                'job'       => '\App\Jobs\SendAlreadyPaidEmail',
-                'to'        => $orders[0]->customer_email,
-                'cc'        => null,
-                'bcc'       => null,
-                'details'   => $details,
-            ];
-
-            $this->mailController->sendMail($data);
+            $order = Order::whereHas('store', function($q) {
+                $q->where('vendor_id', auth('sanctum')->user()->id);
+            })->where('transaction_id', $transactionId)->first();
+            $order->notify(new OrderPaid);
 
             return $this->sendResponse($orders);
         } catch (\Exception $e) {

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\API\v1\BaseController;
-use App\Http\Controllers\SendMailController;
 use App\Models\Otp;
 use App\Models\Vendor;
 use App\Notifications\EmailVerification;
@@ -12,13 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 class VendorController extends BaseController
 {
-    protected $mailController;
-
-    public function __construct(SendMailController $mailController)
-    {
-        $this->mailController = $mailController;
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -137,7 +129,7 @@ class VendorController extends BaseController
                     'email_verified_at' => null
                 ]);
 
-                $vendor->notify(new EmailVerification($vendor));
+                $vendor->notify(new EmailVerification);
             }
 
             // remove mobile_verified_at
