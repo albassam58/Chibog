@@ -26,7 +26,7 @@ const actions = {
 	async loginVendor({commit}, credentials) {
 		try {
 			axios.defaults.baseURL = '/';
-			await axios.post('/login', credentials);
+			await axios.post('/login', credentials, { toasterSuccess: false });
 			localStorage.setItem('authenticated', true);
 		} catch (err) {
 			throw err;
@@ -39,10 +39,25 @@ const actions = {
 			throw err;
 		}
 	},
+	async forgotPassword({ commit }, form) {
+		try {
+			await axios.post('/v1/vendor/forgot-password', form, { toasterMessage: "Email successfully sent!"});
+		} catch (err) {
+			throw err;
+		}
+	},
+	async updateVendor({ commit }, form) {
+		try {
+			let { data } = await axios.put('/v1/vendor/update', form);
+			commit('setVendor', data.data);
+		} catch (err) {
+			throw err;
+		}
+	},
 	async logoutVendor() {
 		try {
 			axios.defaults.baseURL = '/';
-			await axios.post('/logout');
+			await axios.post('/logout', {}, { toasterSuccess: false });
 			localStorage.setItem('authenticated', false);
 		} catch (err) {
 			throw err;

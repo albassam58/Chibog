@@ -1,3 +1,10 @@
+<route>
+  {
+    "meta": {
+      "requiresAuth": true
+    }
+  }
+</route>
 <template>
 	<div>
 		<v-container>
@@ -14,7 +21,7 @@
 					<div class="text-h4 mb-4">Orders</div>
 				</v-col>
 				<v-col cols="6" class="d-flex flex-row-reverse">
-					<v-btn color="secondary" dark @click="$router.back(-1)" text>
+					<v-btn color="default" @click="$router.back(-1)" text>
 						<v-icon>mdi-arrow-left</v-icon>
 						Back
 					</v-btn>
@@ -41,8 +48,16 @@
 			        ></v-select>
 				</v-col>
 			</v-row>
+
+			<v-row>
+				<v-spacer />
+				<paginate action="orders/fetchByVendor" collection="orders"></paginate>
+			</v-row>
+
+			<v-divider class="my-8" />
+
 			<div class="text-subtitle-1 grey--text mb-2">
-				Result: {{ orders ? orders.length : 0 }}
+				Result: {{ orders ? orders.total : 0 }}
 			</div>
 			<v-row wrap>
 				<v-col
@@ -50,7 +65,7 @@
 					sm="12"
 					md="6"
 					lg="4"
-					v-for="(order, index) in orders"
+					v-for="(order, index) in orders.data"
 					:key="index"
 				>
 					<v-card>
@@ -503,6 +518,7 @@
 		},
 		data: () => ({
 			search: "",
+			itemsPerPage: 20,
 			transactionId: null,
 			searchLoading: false,
 			updateStatusDialog: false,
@@ -553,7 +569,7 @@
 	        	},
 	        	{
 	        		id: 6,
-	        		name: 'Cancel',
+	        		name: 'Cancelled',
 	        		color: 'red'
 	        	},
 	        ]
@@ -567,18 +583,20 @@
 				// 	search: vm.$route.query.search
 				// });
 
-				vm.search = vm.$route.query.search
+				vm.search = vm.$route.query.search;
+				return;
 			}
 
+			vm.$store.commit('orders/setParams', { itemsPerPage: vm.itemsPerPage });
 			await vm.fetchByVendor();
 		},
 		computed: {
 			...mapState('orders', {
-				orders: state => state.orders.data,
-				order: state => state.order.data
+				orders: state => state.orders,
+				order: state => state.order
 			}),
 			...mapState('items', {
-				storeItems: state => state.items.data
+				storeItems: state => state.items
 			})
 		},
 		methods: {
@@ -631,13 +649,13 @@
 				let item_ids = order.item_id.split(",");
 
 				// set params of fetch items to store_id = params.id
-	            vm.$store.commit('items/setParams', {
+	            let params = vm.$serialize({
 	                filters: {
 	                    store_id: order.store_id,
-	                    status: 2
+	                    status: 4
 	                }
 	            });
-				await vm.fetchItems();
+				await vm.fetchItems(params);
 
 				vm.items = _.filter(vm.storeItems, function(object) {
 					if (!item_ids.includes(object.id.toString())) {
@@ -656,6 +674,7 @@
 					customer_region: order.customer_region,
 					customer_province: order.customer_province,
 					customer_city: order.customer_city,
+					customer_street: order.customer_street,
 					customer_barangay: order.customer_barangay,
 					customer_mobile_number: order.customer_mobile_number,
 					customer_email: order.customer_email,
@@ -667,19 +686,25 @@
 			async addItem() {
 				let vm = this;
 
-				let valid = vm.$refs.addItemForm.validate();
-				if (valid) {
-					vm.additionalItem.amount = vm.additionalItem.item.amount;
-					vm.additionalItem.item_id = vm.additionalItem.item.id;
+				try {
+					let valid = vm.$refs.addItemForm.validate();
+					if (valid) {
+						vm.additionalItem.amount = vm.additionalItem.item.amount;
+						vm.additionalItem.item_id = vm.additionalItem.item.id;
 
-					vm.addItemDialogDisable = true;
-					await vm.save(vm.additionalItem);
+						vm.addItemDialogDisable = true;
+						await vm.save(vm.additionalItem);
 
+						vm.additionalItem = {};
+						vm.addItemDialogDisable = false;
+						vm.addItemDialog = false;
+
+						await vm.fetchByVendor();
+					}
+				} catch (err) {
 					vm.additionalItem = {};
 					vm.addItemDialogDisable = false;
 					vm.addItemDialog = false;
-
-					await vm.fetchByVendor();
 				}
 			},
 			async openEditDialog(order, index) {
@@ -696,16 +721,22 @@
 			},
 			async editItem() {
 				let vm = this;
-				let id = vm.existingItem.id;
-				let quantity = vm.existingItem.quantity;
 
-				vm.editItemDialogDisable = true;
-				await vm.update({ id: id, form: { quantity: quantity } });
+				try {
+					let id = vm.existingItem.id;
+					let quantity = vm.existingItem.quantity;
 
-				await vm.fetchByVendor();
+					vm.editItemDialogDisable = true;
+					await vm.update({ id: id, form: { quantity: quantity } });
 
-				vm.editItemDialogDisable = false;
-				vm.editItemDialog = false;
+					await vm.fetchByVendor();
+
+					vm.editItemDialogDisable = false;
+					vm.editItemDialog = false;
+				} catch (err) {
+					vm.editItemDialogDisable = false;
+					vm.editItemDialog = false;
+				}
 			},
 			async openDeleteDialog(id) {
 				let vm = this;
@@ -718,48 +749,68 @@
 			},
 			async deleteItem() {
 				let vm = this;
-				let id = vm.itemToBeRemoved.id;
+				try {
+					let id = vm.itemToBeRemoved.id;
 
-				vm.deleteItemDialogDisable = false;
-				await vm.destroy(id);
+					vm.deleteItemDialogDisable = false;
+					await vm.destroy(id);
 
-				await vm.fetchByVendor();
+					await vm.fetchByVendor();
 
-				vm.deleteItemDialogDisable = false;
-				vm.deleteItemDialog = false;
+					vm.deleteItemDialogDisable = false;
+					vm.deleteItemDialog = false;
+				} catch (err) {
+					vm.deleteItemDialogDisable = false;
+					vm.deleteItemDialog = false;
+				}
 			},
 			async updateOrderStatus() {
 				let vm = this;
 
-				vm.updateStatusDialogDisable = true;
-				await vm.updateStatus(vm.selectedTransaction);
+				try {
+					vm.updateStatusDialogDisable = true;
+					await vm.updateStatus(vm.selectedTransaction);
 
-				await vm.fetchByVendor();
+					await vm.fetchByVendor();
 
-				vm.updateStatusDialog = false;
-				vm.updateStatusDialogDisable = false;
+					vm.updateStatusDialog = false;
+					vm.updateStatusDialogDisable = false;
+				} catch (err) {
+					vm.updateStatusDialog = false;
+					vm.updateStatusDialogDisable = false;
+				}
 			},
 			async updateOrderPaid() {
 				let vm = this;
 
-				vm.updatePaidDialogDisable = true;
+				try {
+					vm.updatePaidDialogDisable = true;
 
-				await vm.paid(vm.transactionId);
-				await vm.fetchByVendor();
+					await vm.paid(vm.transactionId);
+					await vm.fetchByVendor();
 
-				vm.updatePaidDialog = false;
-				vm.updatePaidDialogDisable = false;
+					vm.updatePaidDialog = false;
+					vm.updatePaidDialogDisable = false;
+				} catch (err) {
+					vm.updatePaidDialog = false;
+					vm.updatePaidDialogDisable = false;
+				}
 			},
 			searchList: _.debounce(async function(query) {
 	        	let vm = this;
-	        	vm.searchLoading = true;
-				vm.$store.commit('orders/setParams', { page: 1, search: query });
-				await vm.fetchByVendor();
-				vm.searchLoading = false;
 
-				let url = `/orders?search=${ query }`;
-				if (vm.$route.fullPath !== url)
-				vm.$router.push(`/orders?search=${ query }`);
+	        	try {
+		        	vm.searchLoading = true;
+					vm.$store.commit('orders/setParams', { page: 1, itemsPerPage: vm.itemsPerPage, search: query });
+					await vm.fetchByVendor();
+					vm.searchLoading = false;
+
+					let url = `/orders?search=${ query }`;
+					if (vm.$route.fullPath !== url)
+					vm.$router.push(`/orders?search=${ query }`);
+				} catch (err) {
+					vm.searchLoading = false;
+				}
 		    }, 500),
 		    increment(food) {
 				let vm = this;
@@ -787,6 +838,8 @@
 				let vm = this;
 
 				vm.$store.commit('orders/setParams', {
+					page: 1,
+					itemsPerPage: vm.itemsPerPage,
 					filters: {
 						"orders.status": val
 					}

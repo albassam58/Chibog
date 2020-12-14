@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
@@ -32,6 +33,17 @@ class Vendor extends Authenticatable
     protected $hidden = [
         'password', 'remember_token'
     ];
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
 
     /**
      * check if facebook id already exists
@@ -60,7 +72,7 @@ class Vendor extends Authenticatable
             'vendor.verify', Carbon::now()->addMinutes(60), ['id' => $this->id]
         );
 
-        $url = config('app.url') . "/email/verification?email=" . $this->email . "&queryUrl=" . urlencode($temporarySignedUrl);
+        $url = config('app.url') . "/verification?email=" . $this->email . "&queryUrl=" . urlencode($temporarySignedUrl);
 
         return $url;
     }

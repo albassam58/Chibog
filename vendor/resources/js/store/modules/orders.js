@@ -44,14 +44,14 @@ const actions = {
                 transactionId: transactionId,
                 status: status
             };
-            let { data } = await axios.post('/v1/orders/update/status', request);
+            let { data } = await axios.put('/v1/orders/update/status', request);
         } catch (err) {
             throw err;
         }
     },
     async paid({ commit }, transactionId) {
         try {
-            let { data } = await axios.post(`/v1/orders/update/paid/${ transactionId }`);
+            let { data } = await axios.put(`/v1/orders/update/paid/${ transactionId }`);
         } catch (err) {
             throw err;
         }

@@ -26,6 +26,8 @@ import App from "@components/App"
 import vuetify from "./plugins/vuetify"
 import store from "./store"
 import Axios from "./axios"
+import Toasted from 'vue-toasted';
+
 import CustomDataTable from "@components/CustomDataTableComponent"
 
 Vue.component('custom-data-table', CustomDataTable);
@@ -40,9 +42,11 @@ const MyPlugin = {
     }
   },
 }
-Vue.use(MyPlugin)
 
+Vue.use(MyPlugin)
 Vue.use(require('vue-moment'));
+// toaster-font can be foundn in spa.blade.php
+Vue.use(Toasted, { className: 'toaster-font', position: 'bottom-right', singleton: true })
 
 Vue.mixin({
 	methods: {

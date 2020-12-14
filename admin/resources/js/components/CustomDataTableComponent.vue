@@ -4,6 +4,16 @@
 
             <v-card-title>
                 <v-text-field
+                    v-if="searchHint"
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    :hint="searchHint"
+                    persistent-hint
+                ></v-text-field>
+                <v-text-field
+                    v-else
                     v-model="search"
                     append-icon="mdi-magnify"
                     label="Search"
@@ -17,20 +27,20 @@
                 <slot name="filter"></slot>
             </v-card-text>
 
-    		<v-data-table
-                mustSort
+            <v-data-table
+                multi-sort
                 :page="currentPage"
-    		    :headers="headers"
-    		    :items="items"
-    		    :options.sync="options"
-    		    :server-items-length="totalItems"
-    		    :loading="loading"
-    		    :sort-by="orderBy"
-          		:sort-desc="orderDirection"
-    		    class="elevation-1"
-    		    :footer-props="{
-    			    'items-per-page-options': [1, 10, 15, 50, 100]
-    			}"
+                :headers="headers"
+                :items="items"
+                :options.sync="options"
+                :server-items-length="totalItems"
+                :loading="loading"
+                :sort-by="orderBy"
+                :sort-desc="orderDirection"
+                class="elevation-1"
+                :footer-props="{
+                    'items-per-page-options': [10, 15, 50, 100]
+                }"
             >
                 <template v-slot:item="row">
                     <tr>
@@ -40,20 +50,20 @@
             </v-data-table>
 
         </v-card>
-	</div>
+    </div>
 </template>
 
 <script type="text/javascript">
-	import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions } from 'vuex'
     import FilterDataTable from "@components/FilterDataTableComponent"
     import _ from 'lodash'
 
-	export default {
+    export default {
         components: {
             FilterDataTable
         },
-        props: ['headers', 'module', 'sortBy', 'sortDesc'],
-		data: () => ({
+        props: ['searchHint', 'headers', 'initFilter', 'module', 'sortBy', 'sortDesc'],
+        data: () => ({
             search: '',
             filters: {},
             currentPage: 1,
@@ -87,10 +97,10 @@
             vm.orderDirection = vm.sortDesc;
         },
         methods: {
-			async loadItems() {
-				let vm = this;
+            async loadItems() {
+                let vm = this;
 
-	            vm.loading = true;
+                vm.loading = true;
 
                 const { page, sortBy, sortDesc } = vm.options;
 
@@ -98,18 +108,21 @@
                 vm.orderBy = sortBy;
                 vm.orderDirection = sortDesc;
 
-	            let params = vm.$serialize({
+                let params = vm.$serialize({
                     ...vm.options,
                     search: vm.search,
-                    filters: vm.filters
+                    filters: {
+                        ...vm.filters,
+                        ...vm.initFilter
+                    }
                 });
-	            await vm.$store.dispatch(vm.module, params);
+                await vm.$store.dispatch(vm.module, params);
 
                 vm.items = vm.$store.state[vm.modulePage].items.data;
-	            vm.totalItems = vm.$store.state[vm.modulePage].items.total;
+                vm.totalItems = vm.$store.state[vm.modulePage].items.total;
 
                 vm.loading = false;
-			},
+            },
             searchList: _.debounce(async function(query) {
                 let vm = this;
 
@@ -126,7 +139,10 @@
                     ...vm.options,
                     page: 1, // set current page to 1 if searching
                     search: query,
-                    filters: vm.filters
+                    filters: {
+                        ...vm.initFilter,
+                        ...vm.filters
+                    }
                 });
                 await vm.$store.dispatch(vm.module, params);
 
@@ -146,13 +162,19 @@
                 vm.currentPage = 1;
                 vm.orderBy = sortBy;
                 vm.orderDirection = sortDesc;
-                vm.filters = val;
+                vm.filters = {
+                    ...vm.initFilter,
+                    ...val
+                }
 
                 let params = vm.$serialize({
                     ...vm.options,
                     page: 1, // set current page to 1 if searching
                     search: vm.search,
-                    filters: val
+                    filters: {
+                        ...val,
+                        ...vm.initFilter
+                    }
                 });
                 await vm.$store.dispatch(vm.module, params);
 
@@ -162,5 +184,5 @@
                 vm.loading = false;
             }
         }
-	}
+    }
 </script>
