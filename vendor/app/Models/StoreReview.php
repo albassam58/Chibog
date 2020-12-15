@@ -21,6 +21,10 @@ class StoreReview extends BaseModel
         return $this->last_name . ", " . $this->first_name;
     }
 
+    public function store() {
+        return $this->belongsTo('App\Models\Store', 'store_id');
+    }
+
     public function user() {
     	return $this->belongsTo('App\Models\User', 'created_by')->select(['first_name', 'last_name']);
     }

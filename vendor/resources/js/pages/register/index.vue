@@ -117,7 +117,7 @@
                                 outlined
                                 hide-details="auto"
                                 label="Region"
-                                @change="findProvincesByRegion(form.region)"
+                                @change="regionChanged"
                                 required
                                 :rules="rules"
                             ></v-autocomplete>
@@ -130,7 +130,7 @@
                                 label="Province"
                                 outlined
                                 hide-details="auto"
-                                @change="findCitiesByProvince(form.province)"
+                                @change="provinceChanged"
                                 required
                                 :rules="rules"
                             ></v-autocomplete>
@@ -143,7 +143,7 @@
                                 label="City"
                                 outlined
                                 hide-details="auto"
-                                @change="findBarangaysByProvinceCity({ provinceName: form.province, cityName: form.city })"
+                                @change="cityChanged"
                                 required
                                 :rules="rules"
                             ></v-autocomplete>
@@ -262,6 +262,47 @@
                         vm.disabled = false;
                     }
                 }
+            },
+            async regionChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findProvincesByRegion(vm.form.region);
+
+                vm.$set(vm.form, 'province', undefined);
+                vm.$set(vm.form, 'city', undefined);
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async provinceChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findCitiesByProvince(vm.form.province);
+
+                vm.$set(vm.form, 'city', undefined);
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async cityChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findBarangaysByProvinceCity(
+                    {
+                        provinceName: vm.form.province,
+                        cityName: vm.form.city
+                    }
+                );
+
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
             }
         }
     }

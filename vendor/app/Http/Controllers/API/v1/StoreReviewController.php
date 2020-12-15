@@ -21,17 +21,17 @@ class StoreReviewController extends BaseController
     public function index(Request $request)
     {
         try {
-            $filters = $request->filters;
-            $search = [
-                'query' => null,
-                'columns' => []
-            ];
+            $params = $request->all();
+            $searchColumns = ['first_name', 'last_name'];
 
             $query = new StoreReview();
-            $query = $query->with('user');
-            $reviews = $this->applySearch($query, $search, $filters);
+            $query = $query->whereHas('store', function($q) {
+                $q->where('vendor_id', auth('sanctum')->user()->id);
+            });
 
-            return $this->sendResponse($reviews);
+            $store = $this->applySearch($query, $params, $searchColumns);
+
+            return $this->sendResponse($store);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

@@ -143,7 +143,7 @@
 				        outlined
 				        required
 				        hide-details="auto"
-				        @change="findProvincesByRegion(form.region)"
+				        @change="regionChanged"
 				    ></v-autocomplete>
 				</v-col>
 				<v-col cols="6">
@@ -156,7 +156,7 @@
 				        outlined
 				        required
 				        hide-details="auto"
-				        @change="findCitiesByProvince(form.province)"
+				        @change="provinceChanged"
 				    ></v-autocomplete>
 				</v-col>
 				<v-col cols="6">
@@ -169,7 +169,7 @@
 				        outlined
 				        required
 				        hide-details="auto"
-				        @change="findBarangaysByProvinceCity({ provinceName: form.province, cityName: form.city })"
+				        @change="cityChanged"
 				    ></v-autocomplete>
 				</v-col>
 				<v-col cols="6">
@@ -312,7 +312,7 @@
 	<v-container v-else>
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
-				<div class="text-h4 mb-4">Edit Store</div>
+				<div class="text-h4 mb-4 primary--text">Edit Store</div>
 			</v-col>
 			<v-col cols="6" class="d-flex flex-row-reverse">
 				<v-btn color="default" @click="$router.back(-1)" text>
@@ -471,7 +471,48 @@
         		let placeholder = "https://via.placeholder.com/300/FFFFFF/000000?text=No Image";
 
         		return item.logo ? `/${ item.logo }` : placeholder;
-        	}
+        	},
+        	async regionChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findProvincesByRegion(vm.form.region);
+
+                vm.$set(vm.form, 'province', undefined);
+                vm.$set(vm.form, 'city', undefined);
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async provinceChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findCitiesByProvince(vm.form.province);
+
+                vm.$set(vm.form, 'city', undefined);
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async cityChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findBarangaysByProvinceCity(
+                    {
+                        provinceName: vm.form.province,
+                        cityName: vm.form.city
+                    }
+                );
+
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            }
     	},
     	watch: {
     		file(val) {

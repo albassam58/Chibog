@@ -14,7 +14,7 @@
                 </router-link>
             </v-toolbar-title>
             <v-spacer />
-            <div v-if="authenticated && vendor.email_verified_at && vendor.mobile_verified_at">
+            <div v-if="authenticated && vendor && vendor.email_verified_at && vendor.mobile_verified_at">
                 <order-notification ref="orderNotificationRef"></order-notification>
             </div>
             <div>
@@ -69,6 +69,7 @@
             <v-list
                 dense
                 shaped
+                v-if="vendor"
             >
                 <v-list-item link to="/statistics" v-if="vendor.email_verified_at && vendor.mobile_verified_at">
                     <v-list-item-icon>

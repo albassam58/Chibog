@@ -7,38 +7,16 @@
 </route>
 <template>
 	<v-container>
+		<v-row>
+			<v-col cols="12">
+				<div class="text-h4 mb-4 primary--text">Profile</div>
+			</v-col>
+		</v-row>
 		<v-row v-if="vendor">
 			<v-col cols="12" sm="12" md="7" lg="7">
-				<v-card
-			    	class="overflow-hidden"
-			  	>
-			    	<v-toolbar
-			      		flat
-			      		color="default"
-			    	>
-			      		<v-toolbar-title>
-			        		User Profile
-			      		</v-toolbar-title>
-			      		<template v-slot:extension>
-				            <v-btn
-				              fab
-				              color="primary"
-				              bottom
-				              right
-				              absolute
-				              @click="isEditing = !isEditing"
-				            >
-				              <v-icon v-if="isEditing">
-			          			mdi-close
-			        		</v-icon>
-			        		<v-icon v-else>
-			          			mdi-pencil
-			        		</v-icon>
-				            </v-btn>
-				          </template>
-			    	</v-toolbar>
+				<v-card>
 			    	<v-card-text>
-			    		<v-form ref="form">
+			    		<v-form ref="form" class="mt-12">
 				      		<v-text-field
 				      			v-model="vendor.first_name"
 				        		:disabled="!isEditing"
@@ -46,6 +24,7 @@
 				        		label="First Name"
 				        		required
 				                :rules="rules"
+				                outlined
 				      		></v-text-field>
 				      		<v-text-field
 				      			v-model="vendor.last_name"
@@ -54,6 +33,7 @@
 				        		label="Last Name"
 				        		required
 				                :rules="rules"
+				                outlined
 				      		></v-text-field>
 				      		<!-- <v-text-field
 				      			v-model="vendor.email"
@@ -75,9 +55,10 @@
 				                item-value="id"
 				                item-text="name"
 				                label="Region"
-				                @change="findProvincesByRegion(vendor.region)"
+				                @change="regionChanged"
 				                required
 				                :rules="rules"
+				                outlined
 				            ></v-autocomplete>
 
 				            <v-autocomplete
@@ -86,9 +67,10 @@
 				                :disabled="!isEditing"
 				                autocomplete="new-password"
 				                label="Province"
-				                @change="findCitiesByProvince(vendor.province)"
+				                @change="provinceChanged"
 				                required
 				                :rules="rules"
+				                outlined
 				            ></v-autocomplete>
 
 				            <v-autocomplete
@@ -97,9 +79,10 @@
 				                :disabled="!isEditing"
 				                autocomplete="new-password"
 				                label="City"
-				                @change="findBarangaysByProvinceCity({ provinceName: vendor.province, cityName: vendor.city })"
+				                @change="cityChanged"
 				                required
 				                :rules="rules"
+				                outlined
 				            ></v-autocomplete>
 
 				            <v-autocomplete
@@ -110,6 +93,7 @@
 				                label="Barangay"
 				                required
 				                :rules="rules"
+				                outlined
 				            ></v-autocomplete>
 
 				            <v-text-field
@@ -117,10 +101,31 @@
 				                :disabled="!isEditing"
 				                label="House #, Floor #, Street"
 				                required
+				                outlined
 				                :rules="rules"
 				            ></v-text-field>
 				        </v-form>
 			    	</v-card-text>
+			    	<v-card-text>
+		            	<v-fab-transition>
+			              	<v-btn
+			                	color="primary"
+			                	dark
+			                	absolute
+			                	top
+			                	right
+			                	fab
+			                	@click="isEditing = !isEditing"
+			              	>
+			                	<v-icon v-if="isEditing">
+			          				mdi-close
+			        			</v-icon>
+				        		<v-icon v-else>
+				          			mdi-pencil
+				        		</v-icon>
+		              		</v-btn>
+		            	</v-fab-transition>
+		          	</v-card-text>
 			    	<v-divider></v-divider>
 			    	<v-card-actions>
 			      		<v-spacer></v-spacer>
@@ -660,6 +665,47 @@
             	} catch (err) {
             		console.log(err);
             	}
+            },
+            async regionChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findProvincesByRegion(vm.vendor.region);
+
+                vm.$set(vm.vendor, 'province', undefined);
+                vm.$set(vm.vendor, 'city', undefined);
+                vm.$set(vm.vendor, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async provinceChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findCitiesByProvince(vm.vendor.province);
+
+                vm.$set(vm.vendor, 'city', undefined);
+                vm.$set(vm.vendor, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async cityChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findBarangaysByProvinceCity(
+                    {
+                        provinceName: vm.vendor.province,
+                        cityName: vm.vendor.city
+                    }
+                );
+
+                vm.$set(vm.vendor, 'barangay', undefined);
+
+                vm.disabled = false;
             }
         }
 	}
