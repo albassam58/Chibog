@@ -9,7 +9,7 @@
 	<v-container>
 		<v-row>
 			<v-col cols="12">
-				<div class="text-h4 mb-4">Statistics</div>
+				<div class="text-h4 mb-4 primary--text">Statistics</div>
 			</v-col>
 		</v-row>
 		<v-row>

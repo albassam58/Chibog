@@ -12,7 +12,7 @@
 				cols="6"
 				class="d-flex flex-row"
 			>
-				<div class="text-h4 mb-4">Stores</div>
+				<div class="text-h4 mb-4 primary--text">Stores</div>
 			</v-col>
 			<v-col
 				cols="6"
