@@ -15,9 +15,11 @@
 
 			TOTAL QUANTITY PER ITEM
 		-->
-		<v-col cols="12">
-			<div class="text-h4 mb-4">Orders</div>
-		</v-col>
+		<v-row>
+			<v-col cols="12">
+				<div class="text-h4 mb-4 primary--text">Orders</div>
+			</v-col>
+		</v-row>
 		<v-row>
 			<v-col cols="12" sm="12" md="4">
 				<v-text-field	

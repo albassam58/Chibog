@@ -23,7 +23,7 @@
 	<v-container v-if="store || loading">
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
-				<div class="text-h4 mb-4">View Store</div>
+				<div class="text-h4 mb-4 primary--text">View Store</div>
 			</v-col>
 			<v-col cols="6" class="d-flex flex-row-reverse">
 				<v-btn color="default" @click="$router.back(-1)" text>
