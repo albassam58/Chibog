@@ -23,7 +23,7 @@
                 md="5"
                 class="text-left"
             >
-                <div class="text-h2 primary--text font-weight-bold">REGISTER</div>
+                <div class="text-h2 primary--text font-weight-bold">SIGN UP</div>
                 <div class="text-overline">
                     Dito magsisimula ang iyong pag angat!
                 </div>
@@ -180,7 +180,7 @@
                                 :disabled="disabled"
                                 @click="register"
                                 class="px-16 py-6 mb-2"
-                            >Register</v-btn>
+                            >Sign Up</v-btn>
                         </v-col>
                     </v-row>
                 </v-form>
