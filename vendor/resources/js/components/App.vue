@@ -3,6 +3,7 @@
         <v-app-bar
             v-if="!excludeApp.includes($route.name)"
             app
+            class="d-print-none"
         >
             <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
             <v-toolbar-title>
@@ -50,6 +51,7 @@
             dark
             :mini-variant="$vuetify.breakpoint.mdAndDown"
             v-if="!excludeApp.includes($route.name)"
+            class="d-print-none"
         >
             <v-list v-if="vendor">
                 <v-list-item link>

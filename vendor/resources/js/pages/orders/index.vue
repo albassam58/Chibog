@@ -15,12 +15,12 @@
 
 			TOTAL QUANTITY PER ITEM
 		-->
-		<v-row>
+		<v-row class="d-print-none">
 			<v-col cols="12">
 				<div class="text-h4 mb-4 primary--text">Orders</div>
 			</v-col>
 		</v-row>
-		<v-row>
+		<v-row class="d-print-none">
 			<v-col cols="12" sm="12" md="4">
 				<v-text-field	
 		            v-model="search"
@@ -42,16 +42,17 @@
 			</v-col>
 		</v-row>
 
-		<v-row v-if="orders.total">
+		<v-row v-if="orders.total" class="d-print-none">
 			<v-spacer />
 			<paginate action="orders/fetchByVendor" collection="orders"></paginate>
 		</v-row>
 
-		<v-divider class="my-8" />
+		<v-divider class="my-8 d-print-none" />
 
-		<div class="text-subtitle-1 grey--text mb-2">
+		<div class="text-subtitle-1 grey--text mb-2 d-print-none">
 			Result: {{ orders ? orders.total : 0 }}
 		</div>
+
 		<v-row wrap>
 			<v-col
 				cols="12"
@@ -88,7 +89,7 @@
 			          		<v-col cols="3" class="py-0 text-right">
 			          			{{ computeUnitTotal(order, index) }}
 			          		</v-col>
-			          		<v-col cols="3" class="py-0 text-right">
+			          		<v-col cols="3" class="py-0 text-right d-print-none">
 			          			<v-tooltip bottom>
 							      	<template v-slot:activator="{ on, attrs }">
 					          			<v-btn
@@ -121,7 +122,7 @@
 					          	</v-tooltip>
 			          		</v-col>
 		        		</v-row>
-		        		<v-row>
+		        		<v-row class="d-print-none">
 		        			<v-col cols="12" class="text-center">
 		        				<v-tooltip bottom>
 							      	<template v-slot:activator="{ on, attrs }">
@@ -238,8 +239,8 @@
 		        			</v-col>
 		        		</v-row>
 					</v-card-text>
-					<v-divider />
-					<v-card-actions>
+					<v-divider class="d-print-none" />
+					<v-card-actions class="d-print-none">
 						<v-btn
 							v-if="order.status.id != 6 && order.status.id != 5"
 							color="red"
@@ -288,7 +289,7 @@
 
 		<v-divider class="my-8" />
 
-		<v-row>
+		<v-row class="d-print-none">
 			<v-spacer />
 			<paginate action="orders/fetchByVendor" collection="orders"></paginate>
 		</v-row>
