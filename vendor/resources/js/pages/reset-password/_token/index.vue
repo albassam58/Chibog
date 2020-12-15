@@ -1,68 +1,86 @@
 <template>
-	<div>
-		<v-container>
-            <v-row
-                justify="center"
+	<v-container style="height: 100%">
+        <v-row
+            class="vertical-center"
+            align="center"
+        >
+            <v-col
+                cols="12"
+                sm="6"
+                md="7"
             >
-                <v-col
-                    cols="12"
-                    sm="8"
-                    md="6"
+                <v-img
+                    src="/images/Food Collage.jpg"
+                    :aspect-ratio="16/9"
+                    width="600"
+                    gradient="to top right, rgba(255,255,255,.3), rgba(255,255,255,.4)"
                 >
-                    <v-card class="elevation-12">
-                        <v-toolbar
-                            color="primary"
-                            dark
-                            flat
-                        >
-                            <v-toolbar-title>Forgot Password</v-toolbar-title>
-                            <v-spacer></v-spacer>
-                        </v-toolbar>
-                        <v-card-text>
-                            <v-form ref="form">
-                                <v-row>
-                                    <v-col cols="12">
-                                        <v-text-field
-                                            id="password"
-                                            label="Password"
-                                            name="password"
-                                            prepend-icon="mdi-lock"
-                                            type="password"
-                                            v-model="form.password"
-                                            required
-                                            @keyup.enter="resetPassword"
-                                            :rules="passwordRules"
-                                        ></v-text-field>
-
-                                        <v-text-field
-                                            id="password_confirmation"
-                                            label="Password Confirmation"
-                                            name="password_confirmation"
-                                            prepend-icon="mdi-lock"
-                                            type="password"
-                                            v-model="form.password_confirmation"
-                                            required
-                                            @keyup.enter="resetPassword"
-                                            :rules="rules.concat(passwordConfirmationRule)"
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-form>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer />
+                </v-img>
+            </v-col>
+            <v-col
+                cols="12"
+                sm="6"
+                md="5"
+                class="text-left"
+            >
+                <div class="text-h2 primary--text font-weight-bold">RESET PASSWORD</div>
+                <div class="text-overline">
+                    Wag mo ulit kakalimutan ang iyong password para tuloy tuloy ang kita.
+                </div>
+                <v-form ref="form">
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                id="password"
+                                label="New Password"
+                                name="password"
+                                outlined
+                                hide-details="auto"
+                                type="password"
+                                v-model="form.password"
+                                required
+                                @keyup.enter="resetPassword"
+                                :rules="passwordRules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-text-field
+                                id="password_confirmation"
+                                label="Password Confirmation"
+                                name="password_confirmation"
+                                outlined
+                                hide-details="auto"
+                                type="password"
+                                v-model="form.password_confirmation"
+                                required
+                                @keyup.enter="resetPassword"
+                                :rules="rules.concat(passwordConfirmationRule)"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" class="mt-2">
                             <v-btn
+                                text
+                                color="primary"
+                                @click="$router.push('/login')"
+                            >
+                                <v-icon>mdi-arrow-left</v-icon>
+                                Login
+                            </v-btn>
+                        </v-col>
+                        <v-col cols="12" sm="6" class="text-right">
+                            <v-btn
+                                rounded
                                 :disabled="disabled"
                                 color="primary"
                                 @click="resetPassword"
-                                class="px-12 mb-2 mr-2"
+                                class="py-6"
                             >Reset Password</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-col>
-            </v-row>
-        </v-container>
-	</div>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script type="text/javascript">
@@ -113,3 +131,11 @@
         }
 	}
 </script>
+
+<style scoped>
+    .vertical-center {
+        position: relative;top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+</style>

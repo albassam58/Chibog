@@ -9,17 +9,18 @@ const opts = {
 	theme: {
     	themes: {
       		light: {
-        		primary: colors.orange.darken2,
-            success: colors.orange.darken2,
+        		primary: "#f24e1e",//colors.orange.darken2,
+            success: "#f24e1e",//colors.orange.darken2,
         		secondary: colors.grey.darken1,
         		accent: colors.shades.black,
         		error: colors.red.darken3,
-        		background: colors.orange.darken2
+            header: '#FFFFFF',
+        		background: "#f24e1e"//colors.orange.darken2
       		},
 	      	dark: {
-	        	primary: colors.orange.darken3,
-	        	background: colors.orange.darken3,
-            success: colors.orange.darken3,
+	        	primary: "#f24e1e",//colors.orange.darken3,
+	        	background: "#f24e1e",//colors.orange.darken3,
+            success: "#f24e1e",//colors.orange.darken3,
 	      	}
     	}
   	}

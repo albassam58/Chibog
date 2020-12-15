@@ -1,152 +1,192 @@
 <template>
-    <div>
-        <v-container
-            class="fill-height"
-            fluid
+    <v-container style="height: 100%">
+        <v-row
+            class="vertical-center"
+            align="center"
         >
-            <v-row
-                align="center"
-                justify="center"
+            <v-col
+                cols="12"
+                sm="6"
+                md="7"
             >
-                <v-col
-                    cols="12"
-                    sm="8"
-                    md="6"
+                <v-img
+                    src="/images/Food Collage.jpg"
+                    :aspect-ratio="16/9"
+                    width="600"
+                    gradient="to top right, rgba(255,255,255,.3), rgba(255,255,255,.4)"
                 >
-                    <v-card class="elevation-12">
-                        <v-toolbar
-                            color="primary"
-                            dark
-                            flat
-                        >
-                            <v-toolbar-title>Register form</v-toolbar-title>
-                            <v-spacer></v-spacer>
-                    
-                        </v-toolbar>
-                        <v-card-text>
-                            <!-- <v-btn href="/auth/facebook" color="primary">Login with Facebook</v-btn> -->
-                            <v-form
-                                ref="form"
-                                v-model="valid"
-                            >
-                                <v-text-field
-                                    label="First Name"
-                                    name="first_name"
-                                    type="text"
-                                    v-model="form.first_name"
-                                    required
-                                    :rules="rules"
-                                ></v-text-field>
-
-                                <v-text-field
-                                    label="Last Name"
-                                    name="last_name"
-                                    type="text"
-                                    v-model="form.last_name"
-                                    required
-                                    :rules="rules"
-                                ></v-text-field>
-
-                                <v-text-field
-                                    label="Email"
-                                    name="email"
-                                    type="email"
-                                    v-model="form.email"
-                                    required
-                                    :rules="emailRules"
-                                ></v-text-field>
-
-                                <v-text-field
-                                    label="Mobile Number"
-                                    name="mobile_number"
-                                    type="text"
-                                    v-model="form.mobile_number"
-                                    required
-                                    :rules="rules"
-                                ></v-text-field>
-
-                                <v-text-field
-                                    id="password"
-                                    label="Password"
-                                    name="password"
-                                    type="password"
-                                    v-model="form.password"
-                                    required
-                                    :rules="passwordRules"
-                                ></v-text-field>
-
-                                <v-text-field
-                                    id="password_confirmation"
-                                    label="Password Confirmation"
-                                    name="password_confirmation"
-                                    type="password"
-                                    v-model="form.password_confirmation"
-                                    required
-                                    :rules="rules.concat(passwordConfirmationRule)"
-                                ></v-text-field>
-
-                                <v-autocomplete
-                                    v-model="form.region"
-                                    :items="regions"
-                                    autocomplete="new-password"
-                                    item-value="id"
-                                    item-text="name"
-                                    label="Region"
-                                    @change="findProvincesByRegion(form.region)"
-                                    required
-                                    :rules="rules"
-                                ></v-autocomplete>
-
-                                <v-autocomplete
-                                    v-model="form.province"
-                                    :items="provinces"
-                                    autocomplete="new-password"
-                                    label="Province"
-                                    @change="findCitiesByProvince(form.province)"
-                                    required
-                                    :rules="rules"
-                                ></v-autocomplete>
-
-                                <v-autocomplete
-                                    v-model="form.city"
-                                    :items="cities"
-                                    autocomplete="new-password"
-                                    label="City"
-                                    @change="findBarangaysByProvinceCity({ provinceName: form.province, cityName: form.city })"
-                                    required
-                                    :rules="rules"
-                                ></v-autocomplete>
-
-                                <v-autocomplete
-                                    v-model="form.barangay"
-                                    :items="barangays"
-                                    autocomplete="new-password"
-                                    label="Barangay"
-                                    required
-                                    :rules="rules"
-                                ></v-autocomplete>
-
-                                <v-text-field
-                                    v-model="form.street"
-                                    label="House #, Floor #, Street"
-                                    required
-                                    :rules="rules"
-                                ></v-text-field>
-                            </v-form>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
+                </v-img>
+            </v-col>
+            <v-col
+                cols="12"
+                sm="6"
+                md="5"
+                class="text-left"
+            >
+                <div class="text-h2 primary--text font-weight-bold">REGISTER</div>
+                <div class="text-overline">
+                    Dito magsisimula ang iyong pag angat!
+                </div>
+                <v-form
+                    ref="form"
+                    v-model="valid"
+                >
+                    <v-row>
+                        <v-col cols="6">
+                            <v-text-field
+                                label="First Name"
+                                name="first_name"
+                                type="text"
+                                outlined
+                                autofocus
+                                hide-details="auto"
+                                v-model="form.first_name"
+                                required
+                                :rules="rules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                label="Last Name"
+                                name="last_name"
+                                type="text"
+                                outlined
+                                hide-details="auto"
+                                v-model="form.last_name"
+                                required
+                                :rules="rules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="7">
+                            <v-text-field
+                                label="Email"
+                                name="email"
+                                type="email"
+                                outlined
+                                hide-details="auto"
+                                v-model="form.email"
+                                required
+                                :rules="emailRules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field
+                                label="Mobile Number"
+                                name="mobile_number"
+                                type="text"
+                                outlined
+                                hide-details="auto"
+                                v-model="form.mobile_number"
+                                required
+                                :rules="rules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                id="password"
+                                label="Password"
+                                name="password"
+                                type="password"
+                                outlined
+                                hide-details="auto"
+                                v-model="form.password"
+                                required
+                                :rules="passwordRules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                id="password_confirmation"
+                                label="Password Confirmation"
+                                name="password_confirmation"
+                                type="password"
+                                outlined
+                                hide-details="auto"
+                                v-model="form.password_confirmation"
+                                required
+                                :rules="rules.concat(passwordConfirmationRule)"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-autocomplete
+                                v-model="form.region"
+                                :items="regions"
+                                autocomplete="new-password"
+                                item-value="id"
+                                item-text="name"
+                                outlined
+                                hide-details="auto"
+                                label="Region"
+                                @change="findProvincesByRegion(form.region)"
+                                required
+                                :rules="rules"
+                            ></v-autocomplete>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-autocomplete
+                                v-model="form.province"
+                                :items="provinces"
+                                autocomplete="new-password"
+                                label="Province"
+                                outlined
+                                hide-details="auto"
+                                @change="findCitiesByProvince(form.province)"
+                                required
+                                :rules="rules"
+                            ></v-autocomplete>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-autocomplete
+                                v-model="form.city"
+                                :items="cities"
+                                autocomplete="new-password"
+                                label="City"
+                                outlined
+                                hide-details="auto"
+                                @change="findBarangaysByProvinceCity({ provinceName: form.province, cityName: form.city })"
+                                required
+                                :rules="rules"
+                            ></v-autocomplete>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-autocomplete
+                                v-model="form.barangay"
+                                :items="barangays"
+                                autocomplete="new-password"
+                                label="Barangay"
+                                required
+                                outlined
+                                hide-details="auto"
+                                :rules="rules"
+                            ></v-autocomplete>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="form.street"
+                                label="House #, Floor #, Street"
+                                required
+                                outlined
+                                hide-details="auto"
+                                :rules="rules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" class="mt-2 text-overline">
+                            Have an account? <router-link to="/login">Sign in</router-link>
+                        </v-col>
+                        <v-col cols="12" sm="6" class="text-right">
                             <v-btn
+                                rounded
                                 color="primary"
                                 :disabled="disabled"
                                 @click="register"
+                                class="px-16 py-6 mb-2"
                             >Register</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-col>
-            </v-row>
-        </v-container>
-    </div>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script type="text/javascript">
@@ -226,3 +266,11 @@
         }
     }
 </script>
+
+<style scoped>
+    .vertical-center {
+        position: relative;top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+</style>

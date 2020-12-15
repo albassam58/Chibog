@@ -177,13 +177,14 @@
 		        	<v-card-actions>
 		          		<v-spacer></v-spacer>
 		          		<v-btn
-		          			color="grey"
+		          			color="default"
 		          			text
 		          			@click="closeForcedClosedDialog"
 	          			>Cancel</v-btn>
 		          		<v-btn
 		            		color="primary"
-		            		text
+		            		rounded
+		            		class="px-8"
 		            		:disabled="forcedClosedDialogDisable"
 		            		@click="updateIsForcedClosed"
 		          		>
