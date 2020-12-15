@@ -98,10 +98,10 @@
 
             <template v-slot:append>
                 <v-list
-                    nav
                     dense
+                    shaped
                 >
-                    <v-list-item link @click="logout">
+                    <v-list-item @click="logout">
                         <v-list-item-icon>
                             <v-icon>mdi-logout</v-icon>
                         </v-list-item-icon>
