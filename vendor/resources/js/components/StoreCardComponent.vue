@@ -63,7 +63,7 @@
 		          			v-if="hasRating"
 		          			text
 		          			color="primary"
-		          			@click="goto('reviews')"
+		          			@click="$router.push('/stores/' + store.id + '/reviews')"
 		          		>{{ store.rate }} ({{ store.reviews_count }})</v-btn>
 		          		<div
 		          			v-else

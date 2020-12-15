@@ -41,7 +41,7 @@
 				sm="6"
 				md="4"
 			>
-				<store-card :store="store" :hasEdit="true"></store-card>
+				<store-card :store="store" :hasEdit="true" :hasRating="true"></store-card>
 			</v-col>
 
 			<!-- ADD ITEM -->

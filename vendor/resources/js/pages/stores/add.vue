@@ -143,7 +143,7 @@
 				        outlined
 				        required
 				        hide-details="auto"
-				        @change="findProvincesByRegion(form.region)"
+				        @change="regionChanged"
 				    ></v-autocomplete>
 				</v-col>
 				<v-col cols="6">
@@ -156,7 +156,7 @@
 				        outlined
 				        required
 				        hide-details="auto"
-				        @change="findCitiesByProvince(form.province)"
+				        @change="provinceChanged"
 				    ></v-autocomplete>
 				</v-col>
 				<v-col cols="6">
@@ -169,7 +169,7 @@
 				        outlined
 				        required
 				        hide-details="auto"
-				        @change="findBarangaysByProvinceCity({ provinceName: form.province, cityName: form.city })"
+				        @change="cityChanged"
 				    ></v-autocomplete>
 				</v-col>
 				<v-col cols="6">
@@ -450,7 +450,48 @@
 	        			vm.form.schedule_day = oldScheduleDay;
 	        		}
         		}
-      		}
+      		},
+      		async regionChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findProvincesByRegion(vm.form.region);
+
+                vm.$set(vm.form, 'province', undefined);
+                vm.$set(vm.form, 'city', undefined);
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async provinceChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findCitiesByProvince(vm.form.province);
+
+                vm.$set(vm.form, 'city', undefined);
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            },
+            async cityChanged() {
+                let vm = this;
+
+                vm.disabled = true;
+
+                await vm.findBarangaysByProvinceCity(
+                    {
+                        provinceName: vm.form.province,
+                        cityName: vm.form.city
+                    }
+                );
+
+                vm.$set(vm.form, 'barangay', undefined);
+
+                vm.disabled = false;
+            }
     	},
     	watch: {
     		file(val) {

@@ -14,6 +14,7 @@ use App\Http\Controllers\API\v1\RegionController;
 use App\Http\Controllers\API\v1\RegisterController;
 use App\Http\Controllers\API\v1\StatisticController;
 use App\Http\Controllers\API\v1\StoreController;
+use App\Http\Controllers\API\v1\StoreReviewController;
 use App\Http\Controllers\API\v1\VendorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +66,9 @@ Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum', 'vendor_is_veri
 	// stores
 	Route::post('/stores/upload', [StoreController::class, 'upload']);
 	Route::apiResource('stores', StoreController::class);
+
+	//store reviews
+	Route::apiResource('/store-reviews', StoreReviewController::class);
 
 	Route::apiResource('cuisines', CuisineController::class);
 	Route::apiResource('food-types', FoodTypeController::class);
