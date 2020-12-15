@@ -125,6 +125,7 @@
 					v-for="(day, index) in scheduleDay(store)"
 					:key="day.short"
 			      	:color="day.color"
+			      	:dark="day.short == 'Mon' || day.short == 'Thu' ? false : true"
 			    >
 			      	{{ day.short }}
 			    </v-chip>
