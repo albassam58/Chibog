@@ -1,106 +1,125 @@
 <template>
     <v-app>
-        <div>
-            <v-app-bar
-                color="background"
-                dense
-                dark>
-                <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
-                <v-toolbar-title>
-                    <router-link
-                        to="/"
-                        class="white--text text-decoration-none"
-                    >
-                        ENKA
-                    </router-link>
-                </v-toolbar-title>
-                <v-spacer></v-spacer>
-                <div v-if="authenticated && vendor.email_verified_at && vendor.mobile_verified_at">
-                    <order-notification ref="orderNotificationRef"></order-notification>
-                </div>
-                <div>
-                    <v-tooltip
-                        v-if="!$vuetify.theme.dark"
-                        bottom
-                    >
-                        <template v-slot:activator="{ on }">
-                            <v-btn v-on="on" color="info" icon @click="darkMode">
-                                <v-icon class="mr-1">mdi-moon-waxing-crescent</v-icon>
-                            </v-btn>
-                        </template>
-                        <span>Dark Mode On</span>
-                    </v-tooltip>
-
-                    <v-tooltip
-                        v-else
-                        bottom
-                    >
-                        <template v-slot:activator="{ on }">
-                            <v-btn v-on="on" color="info" icon @click="darkMode">
-                                <v-icon color="yellow">mdi-white-balance-sunny</v-icon>
-                            </v-btn>
-                        </template>
-                        <span>Dark Mode Off</span>
-                    </v-tooltip>
-                </div>
-
-                <v-menu
-                    v-if="authenticated"
-                    left
+        <v-app-bar
+            v-if="!excludeApp.includes($route.name)"
+            app
+        >
+            <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
+            <v-toolbar-title>
+                <router-link
+                    to="/"
+                    class="text-decoration-none"
+                >
+                    <strong>ENKA</strong>
+                </router-link>
+            </v-toolbar-title>
+            <v-spacer />
+            <div v-if="authenticated && vendor.email_verified_at && vendor.mobile_verified_at">
+                <order-notification ref="orderNotificationRef"></order-notification>
+            </div>
+            <div>
+                <v-tooltip
+                    v-if="!$vuetify.theme.dark"
                     bottom
                 >
-                    <template
-                        v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            icon
-                            v-bind="attrs"
-                            v-on="on"
-                        >
-                            <v-icon>mdi-dots-vertical</v-icon>
+                    <template v-slot:activator="{ on }">
+                        <v-btn v-on="on" color="info" icon @click="darkMode">
+                            <v-icon class="mr-1">mdi-moon-waxing-crescent</v-icon>
                         </v-btn>
                     </template>
-                    <v-list>
-                        <v-list-item @click="$router.push('/vendor')">
-                            <v-list-item-title>
-                                <v-icon>mdi-account</v-icon>
-                                {{ vendor.first_name }}
-                            </v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="$router.push('/orders')" v-if="vendor.email_verified_at">
-                            <v-list-item-title>
-                                <v-icon>mdi-cart</v-icon>
-                                Orders
-                            </v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="$router.push('/statistics')" v-if="vendor.email_verified_at">
-                            <v-list-item-title>
-                                <v-icon>mdi-chart-box</v-icon>
-                                Statistics
-                            </v-list-item-title>
-                        </v-list-item>
-                        <v-divider></v-divider>
-                        <v-list-item @click="logout">
-                            <v-list-item-title>
-                                <v-icon class="red--text text-darken-4">mdi-logout</v-icon>
-                                <span class="red--text text-darken-4">Logout</span>
-                            </v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-                <span v-else>
-                    <router-link
-                        to="/register"
-                        class="white--text text-decoration-none"
-                    >Register</router-link>
-                    <router-link
-                        to="/login"
-                        class="white--text text-decoration-none"
-                    >Login</router-link>
-                </span>
-            </v-app-bar>
-            
+                    <span>Dark Mode On</span>
+                </v-tooltip>
+
+                <v-tooltip
+                    v-else
+                    bottom
+                >
+                    <template v-slot:activator="{ on }">
+                        <v-btn v-on="on" color="info" icon @click="darkMode">
+                            <v-icon color="yellow">mdi-white-balance-sunny</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Dark Mode Off</span>
+                </v-tooltip>
+            </div>
+        </v-app-bar>
+        <v-navigation-drawer
+            app
+            permanent
+            color="background"
+            dark
+            :mini-variant="$vuetify.breakpoint.mdAndDown"
+            v-if="!excludeApp.includes($route.name)"
+        >
+            <v-list v-if="vendor">
+                <v-list-item link>
+                    <v-list-item-content>
+                        <v-list-item-title class="title">
+                            {{ vendor.full_name }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                            {{ vendor.email }}
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+
+            <v-divider></v-divider>
+
+            <v-list
+                dense
+                shaped
+            >
+                <v-list-item link to="/statistics" v-if="vendor.email_verified_at && vendor.mobile_verified_at">
+                    <v-list-item-icon>
+                        <v-icon>mdi-chart-box</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Statistics</v-list-item-title>
+                </v-list-item>
+                <v-list-item link to="/orders" v-if="vendor.email_verified_at && vendor.mobile_verified_at">
+                    <v-list-item-icon>
+                        <v-icon>mdi-cart</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Orders</v-list-item-title>
+                </v-list-item>
+                <v-list-item link to="/stores" v-if="vendor.email_verified_at && vendor.mobile_verified_at">
+                    <v-list-item-icon>
+                        <v-icon>mdi-store</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Stores</v-list-item-title>
+                </v-list-item>
+                <v-list-item link to="/vendor">
+                    <v-list-item-icon>
+                        <v-icon>mdi-account</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Profile</v-list-item-title>
+                </v-list-item>
+            </v-list>
+
+            <template v-slot:append>
+                <v-list
+                    nav
+                    dense
+                >
+                    <v-list-item link @click="logout">
+                        <v-list-item-icon>
+                            <v-icon>mdi-logout</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>Logout</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+                <!-- <div class="pa-2">
+                    <v-btn text @click="logout">
+                        <v-icon>mdi-logout</v-icon>
+                        Logout
+                    </v-btn>
+                </div> -->
+             </template>
+        </v-navigation-drawer>
+
+        <v-content>
             <router-view :key="$route.fullPath" />
-        </div>
+        </v-content>
     </v-app>
 </template>
 <script type="text/javascript">
@@ -113,6 +132,12 @@
         },
 		data: () => ({
             alreadyVerified: false,
+            excludeApp: [
+                'login',
+                'register',
+                'forgot-password',
+                'reset-password-token'
+            ]
 		}),
 		async created() {
 			let vm = this;
@@ -128,7 +153,8 @@
             }
 
             // set dark mode
-            vm.$vuetify.theme.dark = darkMode === 'true' ? true : false;
+            if (!vm.excludeApp.includes(vm.$route.name))
+                vm.$vuetify.theme.dark = darkMode === 'true' ? true : false;
 
             if (vm.vendor) {
                 // Connect to Socket.io

@@ -149,10 +149,11 @@
 		          			@click="deleteDialog = false"
 	          			>Cancel</v-btn>
 		          		<v-btn
+		          			rounded
 		            		color="error"
-		            		text
 		            		:disabled="deleteDialogDisable"
 		            		@click="deleteChecked"
+		            		class="px-8"
 		          		>Delete</v-btn>
 		        	</v-card-actions>
 		      	</v-card>
@@ -182,10 +183,11 @@
 	          			>Cancel</v-btn>
 		          		<v-btn
 		            		color="primary"
-		            		text
+		            		rounded
 		            		:disabled="markAsReadDialogDisable"
 		            		@click="readChecked"
-		          		>Update</v-btn>
+		            		class="px-8"
+		          		>Read</v-btn>
 		        	</v-card-actions>
 		      	</v-card>
 		    </v-dialog>

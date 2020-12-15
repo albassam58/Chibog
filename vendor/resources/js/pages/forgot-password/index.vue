@@ -1,60 +1,73 @@
 <template>
-	<div>
-		<v-container>
-            <v-row
-                justify="center"
+	<v-container style="height: 100%">
+		<v-row
+            class="vertical-center"
+            align="center"
+        >
+            <v-col
+                cols="12"
+                sm="6"
+                md="7"
             >
-                <v-col
-                    cols="12"
-                    sm="8"
-                    md="6"
+                <v-img
+                    src="/images/Food Collage.jpg"
+                    :aspect-ratio="16/9"
+                    width="600"
+                    gradient="to top right, rgba(255,255,255,.3), rgba(255,255,255,.4)"
                 >
-                    <v-card class="elevation-12">
-                        <v-toolbar
-                            color="primary"
-                            dark
-                            flat
-                        >
-                            <v-toolbar-title>Forgot Password</v-toolbar-title>
-                            <v-spacer></v-spacer>
-                        </v-toolbar>
-                        <v-card-text>
-                            <!-- <v-btn href="/auth/facebook" color="primary">Login with Facebook</v-btn> -->
-                            <v-form>
-                                <v-row>
-                                    <v-col cols="12">
-                                        <v-text-field
-                                            label="Email"
-                                            name="email"
-                                            prepend-icon="mdi-account"
-                                            type="email"
-                                            v-model="form.email"
-                                            @keyup.enter="forgot"
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-form>
-                        </v-card-text>
-                        <v-card-actions>
+                </v-img>
+            </v-col>
+            <v-col
+                cols="12"
+                sm="6"
+                md="5"
+                class="text-left"
+            >
+                <div class="text-h2 primary--text font-weight-bold">FORGOT PASSWORD</div>
+                <div class="text-overline">
+                    Wag masyadong makakalimutin para tuloy tuloy ang kita.
+                </div>
+                <v-form ref="form" @submit.prevent>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                label="Email"
+                                name="email"
+                                type="email"
+                                outlined
+                                hide-details="auto"
+                                v-model="form.email"
+                                @keyup.enter="forgot"
+                                required
+                                autofocus
+                                 class="grow"
+                                :rules="emailRules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" class="mt-2">
                             <v-btn
-                                color="primary"
                                 text
+                                color="primary"
                                 @click="$router.push('/login')"
-                                class="px-12 mb-2 mr-2"
-                            >Login</v-btn>
-                            <v-spacer />
+                            >
+                                <v-icon>mdi-arrow-left</v-icon>
+                                Login
+                            </v-btn>
+                        </v-col>
+                        <v-col cols="12" sm="6" class="text-right">
                             <v-btn
-                            	:disabled="disabled"
-                            	color="primary"
-                            	@click="forgot"
-                            	class="px-12 mb-2 mr-2"
-                            >Send Password Reset Link</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-col>
-            </v-row>
-        </v-container>
-	</div>
+                                rounded
+                                :disabled="disabled"
+                                color="primary"
+                                @click="forgot"
+                                class="py-6"
+                            >Send Reset Link</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script type="text/javascript">
@@ -64,23 +77,40 @@
 		data: () => ({
 			disabled: false,
             form: {},
+            emailRules: [
+                v => !!v || 'Field is required',
+                v => /.+@.+/.test(v) || 'E-mail must be valid',
+            ],
         }),
 		methods: {
             ...mapActions('currentVendor', ['forgotPassword']),
             async forgot() {
                 let vm = this;
-                try {
-                	vm.disabled = true;
 
-                    await vm.forgotPassword(vm.form);
-                    vm.$router.push("/login");
+                let valid = vm.$refs.form.validate();
 
-                    vm.disabled = false;
-                } catch (err) {
-                	vm.disabled = false;
-                    vm.form.email = "";
+                if (valid) {
+                    try {
+                    	vm.disabled = true;
+
+                        await vm.forgotPassword(vm.form);
+                        vm.$router.push("/login");
+
+                        vm.disabled = false;
+                    } catch (err) {
+                    	vm.disabled = false;
+                        vm.form.email = "";
+                    }
                 }
             }
 		},
 	}
 </script>
+
+<style scoped>
+    .vertical-center {
+        position: relative;top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+</style>

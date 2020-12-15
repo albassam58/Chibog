@@ -25,6 +25,8 @@ class Vendor extends Authenticatable
 
     protected $guarded = [];
 
+    protected $appends = ['full_name', 'reversed_full_name'];
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -33,6 +35,14 @@ class Vendor extends Authenticatable
     protected $hidden = [
         'password', 'remember_token'
     ];
+
+    public function getFullNameAttribute() {
+        return $this->first_name . " " . $this->last_name;
+    }
+
+    public function getReversedFullNameAttribute() {
+        return $this->last_name . ", " . $this->first_name;
+    }
 
     /**
      * Send the password reset notification.

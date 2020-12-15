@@ -9,7 +9,7 @@
 
 	<!-- without v-dialog, container is not centered vertically -->
 	<!-- if you know how, feel free to change this -->
-	<v-dialog v-if="loading" v-model="loading" fullscreen full-width :transition="false">
+	<!-- <v-dialog v-if="loading" v-model="loading" fullscreen full-width :transition="false">
 		<v-container fluid fill-height>
 		    <v-layout justify-center align-center>
 		      	<v-progress-circular
@@ -18,9 +18,9 @@
 		      	</v-progress-circular>
 		    </v-layout>
 		</v-container>
-	</v-dialog>
+	</v-dialog> -->
 
-	<v-container v-else-if="store">
+	<v-container v-if="store || loading">
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
 				<div class="text-h4 mb-4">View Store</div>
@@ -51,8 +51,9 @@
 				md="8"
 			>
 				<div class="text-h5">Add Item</div>
+
 				<v-form
-					v-if="items.total < limit"
+					v-if="items.total < limit || itemLoading"
 			    	ref="form"
 			    	v-model="valid"
 			    	lazy-validation
@@ -105,65 +106,97 @@
 		                    </v-img>
 			  			</v-col>
 			  			<v-col>
-			  				<v-file-input
-						    	:rules="imageRules"
-						    	show-size
-						    	accept="image/png, image/jpeg"
-						    	label="Image (JPG, JPEG, TIFF, PNG, WEBP, and BMP) 1MB"
-						    	v-model="file"
-						  	></v-file-input>
-					    	<v-text-field
-					      		v-model="form.name"
-					      		:rules="rules"
-					      		label="Name"
-					      		required
-					    	></v-text-field>
+			  				<v-row>
+			  					<v-col cols="12">
+					  				<v-file-input
+								    	:rules="imageRules"
+								    	show-size
+								    	accept="image/png, image/jpeg"
+								    	label="Image (JPG, JPEG, TIFF, PNG, WEBP, and BMP) 1MB"
+								    	v-model="file"
+								    	outlined
+							      		hide-details="auto"
+								  	></v-file-input>
+								</v-col>
+								<v-col cols="12">
+							    	<v-text-field
+							      		v-model="form.name"
+							      		:rules="rules"
+							      		label="Name"
+							      		required
+							      		outlined
+							      		hide-details="auto"
+							    	></v-text-field>
+							    </v-col>
+							</v-row>
 			  			</v-col>
 			  		</v-row>
 
-			    	<v-textarea
-			      		v-model="form.description"
-			      		:rules="rules"
-			      		label="Short description about your item"
-			      		required
-			    	></v-textarea>
+			  		<v-row>
+			  			<v-col cols="12">
+					    	<v-textarea
+					      		v-model="form.description"
+					      		:rules="rules"
+					      		label="Short description about your item"
+					      		required
+					      		outlined
+							    hide-details="auto"
+					    	></v-textarea>
+					    </v-col>
+					    <v-col cols="12">
+					    	<v-select
+					      		v-model="form.dish"
+					      		:items="dishes"
+					      		:rules="rules"
+					      		item-value="id"
+					      		item-text="name"
+					      		label="Type of Dish"
+					      		required
+					      		outlined
+							    hide-details="auto"
+					    	></v-select>
+					    </v-col>
+					    <v-col cols="12">
+					    	<v-text-field
+					      		v-model="form.amount"
+					      		:rules="rules"
+					      		label="Amount"
+					      		type="number"
+					      		required
+					      		outlined
+							    hide-details="auto"
+					    	></v-text-field>
+					    </v-col>
+					    <v-col cols="12">
+					    	<v-select
+					      		v-model="form.status"
+					      		:items="status"
+					      		:rules="rules"
+					      		item-value="id"
+					      		item-text="name"
+					      		label="Status"
+					      		required
+					      		outlined
+							    hide-details="auto"
+					    	></v-select>
+					    </v-col>
+					</v-row>
 
-			    	<v-select
-			      		v-model="form.dish"
-			      		:items="dishes"
-			      		:rules="rules"
-			      		item-value="id"
-			      		item-text="name"
-			      		label="Type of Dish"
-			      		required
-			    	></v-select>
+					<v-divider class="my-4" />
 
-			    	<v-text-field
-			      		v-model="form.amount"
-			      		:rules="rules"
-			      		label="Amount"
-			      		type="number"
-			      		required
-			    	></v-text-field>
-
-			    	<v-select
-			      		v-model="form.status"
-			      		:items="status"
-			      		:rules="rules"
-			      		item-value="id"
-			      		item-text="name"
-			      		label="Status"
-			      		required
-			    	></v-select>
-
-			    	<v-btn
-			      		:disabled="disabled"
-			      		color="success"
-			      		class="my-4"
-			      		@click="submit"
-			    	>
-			      		Submit
-			    	</v-btn>
+					<v-row>
+					    <v-col class="text-right">
+					    	<v-btn
+					    		rounded
+					      		:disabled="disabled"
+					      		color="success"
+					      		class="px-16 py-6 mb-2"
+					      		@click="submit"
+					    	>
+					      		Submit
+					    	</v-btn>
+					    </v-col>
+					</v-row>
 			  	</v-form>
 
 			  	<div fill-height v-else>
@@ -184,6 +217,7 @@
 		    :initFilter="filters"
 		    :sortBy="sortBy"
       		:sortDesc="sortDesc"
+      		@done="itemLoading = false"
       		ref="table"
         >
         	<template v-slot:item="{ item }">
@@ -292,56 +326,81 @@
 			                    </v-img>
 				  			</v-col>
 				  			<v-col>
-				  				<v-file-input
-							    	:rules="editImageRules"
-							    	show-size
-							    	accept="image/png, image/jpeg"
-							    	label="Image (JPG, JPEG, TIFF, PNG, WEBP, and BMP) 1MB"
-							    	v-model="editFile"
-							  	></v-file-input>
-						    	<v-text-field
-						      		v-model="editForm.name"
-						      		:rules="rules"
-						      		label="Name"
-						      		required
-						    	></v-text-field>
+				  				<v-row>
+				  					<v-col cols="12">
+						  				<v-file-input
+									    	:rules="editImageRules"
+									    	show-size
+									    	accept="image/png, image/jpeg"
+									    	label="Image (JPG, JPEG, TIFF, PNG, WEBP, and BMP) 1MB"
+									    	v-model="editFile"
+									    	outlined
+									    	hide-details="auto"
+									  	></v-file-input>
+									</v-col>
+									<v-col cols="12">
+								    	<v-text-field
+								      		v-model="editForm.name"
+								      		:rules="rules"
+								      		label="Name"
+								      		required
+								      		outlined
+									    	hide-details="auto"
+								    	></v-text-field>
+								    </v-col>
+								</v-row>
 				  			</v-col>
 				  		</v-row>
 
-				    	<v-textarea
-				      		v-model="editForm.description"
-				      		:rules="rules"
-				      		label="Short description about your item"
-				      		required
-				    	></v-textarea>
-
-				    	<v-select
-				      		v-model="editForm.dish"
-				      		:items="dishes"
-				      		:rules="rules"
-				      		item-value="id"
-				      		item-text="name"
-				      		label="Type of Dish"
-				      		required
-				    	></v-select>
-
-				    	<v-text-field
-				      		v-model="editForm.amount"
-				      		:rules="rules"
-				      		label="Amount"
-				      		type="number"
-				      		required
-				    	></v-text-field>
-
-				    	<v-select
-				      		v-model="editForm.status"
-				      		:items="status"
-				      		:rules="rules"
-				      		item-value="id"
-				      		item-text="name"
-				      		label="Status"
-				      		required
-				    	></v-select>
+				  		<v-row>
+				  			<v-col cols="12">
+						    	<v-textarea
+						      		v-model="editForm.description"
+						      		:rules="rules"
+						      		label="Short description about your item"
+						      		required
+						      		outlined
+									hide-details="auto"
+						    	></v-textarea>
+						    </v-col>
+						    <v-col cols="12">
+						    	<v-select
+						      		v-model="editForm.dish"
+						      		:items="dishes"
+						      		:rules="rules"
+						      		item-value="id"
+						      		item-text="name"
+						      		label="Type of Dish"
+						      		required
+						      		outlined
+									hide-details="auto"
+						    	></v-select>
+						    </v-col>
+						    <v-col cols="12">
+						    	<v-text-field
+						      		v-model="editForm.amount"
+						      		:rules="rules"
+						      		label="Amount"
+						      		type="number"
+						      		required
+						      		outlined
+									hide-details="auto"
+						    	></v-text-field>
+						    </v-col>
+						    <v-col cols="12">
+						    	<v-select
+						      		v-model="editForm.status"
+						      		:items="status"
+						      		:rules="rules"
+						      		item-value="id"
+						      		item-text="name"
+						      		label="Status"
+						      		required
+						      		outlined
+									hide-details="auto"
+						    	></v-select>
+						    </v-col>
+						</v-row>
 				  	</v-form>
 	        	</v-card-text>
 
@@ -350,15 +409,16 @@
 	        	<v-card-actions>
 	          		<v-spacer></v-spacer>
 	          		<v-btn
-	          			color="grey"
+	          			color="default"
 	          			text
 	          			@click="hideEditItemDialog(); editItemDialog = false"
           			>Cancel</v-btn>
 	          		<v-btn
 	            		color="primary"
-	            		text
+	            		rounded
 	            		:disabled="editItemDialogDisable"
 	            		@click="editItem"
+	            		class="px-8"
 	          		>Save</v-btn>
 	        	</v-card-actions>
 	      	</v-card>
@@ -366,7 +426,7 @@
 
 	</v-container>
 
-	<v-container fill-height v-else>
+	<v-container v-else>
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
 				<div class="text-h4 mb-4">View Store</div>
@@ -399,6 +459,7 @@
 		data: () => ({
 			valid: true,
 			loading: true,
+			itemLoading: true,
 			limit: 15,
 			form: {},
 			disabled: false,
@@ -554,11 +615,11 @@
 			async editItem() {
 				let vm = this;
 
-				try {
-					vm.editItemDialogDisable = true;
-
-					let valid = vm.$refs.editItemForm.validate();
-	        		if (valid) {
+				let valid = vm.$refs.editItemForm.validate();
+        		if (valid) {
+					try {
+						vm.editItemDialogDisable = true;
+				
         				let formData = new FormData();
 		 				for(let index in vm.editForm) {
 		 					formData.append(index, vm.editForm[index]);
@@ -576,16 +637,16 @@
 						vm.editForm = {};
 						vm.editFile = null;
 						vm.$refs.table.loadItems();
-					}
 
-					vm.editItemDialog = false;
-					vm.editItemDialogDisable = false;
-				} catch (err) {
-					vm.$refs.editItemForm.resetValidation()
-					vm.editForm = {};
-					vm.editFile = null;
-					vm.editItemDialog = false;
-					vm.editItemDialogDisable = false;
+						vm.editItemDialog = false;
+						vm.editItemDialogDisable = false;
+					} catch (err) {
+						vm.$refs.editItemForm.resetValidation()
+						vm.editForm = {};
+						vm.editFile = null;
+						vm.editItemDialog = false;
+						vm.editItemDialogDisable = false;
+					}
 				}
 			},
 			imageLink(item) {

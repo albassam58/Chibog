@@ -8,7 +8,7 @@
 <template>
 	<!-- without v-dialog, container is not centered vertically -->
 	<!-- if you know how, feel free to change this -->
-	<v-dialog v-if="loading" v-model="loading" fullscreen full-width :transition="false">
+	<!-- <v-dialog v-if="loading" v-model="loading" fullscreen full-width :transition="false">
 		<v-container fluid fill-height>
 		    <v-layout justify-center align-center>
 		      	<v-progress-circular
@@ -17,9 +17,9 @@
 		      	</v-progress-circular>
 		    </v-layout>
 		</v-container>
-	</v-dialog>
+	</v-dialog> -->
 
-	<v-container v-else-if="store">
+	<v-container v-if="store || loading">
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
 				<div class="text-h4 mb-4">Edit Store</div>
@@ -84,93 +84,130 @@
                     </v-img>
 	  			</v-col>
 	  			<v-col>
-	  				<v-file-input
-				    	:rules="imageRules"
-				    	show-size
-				    	accept="image/png, image/jpeg"
-				    	label="Image (JPG, JPEG, TIFF, PNG, WEBP, and BMP) 2MB"
-				    	v-model="file"
-				  	></v-file-input>
-				  	<v-text-field
-			      		v-model="form.name"
-			      		:rules="rules"
-			      		label="Name"
-			      		required
-			    	></v-text-field>
+	  				<v-row>
+	  					<v-col cols="12">
+			  				<v-file-input
+						    	:rules="imageRules"
+						    	show-size
+						    	accept="image/png, image/jpeg"
+						    	label="Image (JPG, JPEG, TIFF, PNG, WEBP, and BMP) 2MB"
+						    	v-model="file"
+						    	outlined
+						    	hide-details="auto"
+						  	></v-file-input>
+						  </v-col>
+						  <v-col cols="12">
+						  	<v-text-field
+					      		v-model="form.name"
+					      		:rules="rules"
+					      		label="Name"
+					      		required
+					      		outlined
+						    	hide-details="auto"
+					    	></v-text-field>
+					    </v-col>
+					</v-row>
 	  			</v-col>
 	  		</v-row>
 	    	
-	    	<v-textarea
-	      		v-model="form.description"
-	      		:rules="rules"
-	      		label="Short description about your store"
-	      		required
-	    	></v-textarea>
-
-	    	<v-text-field
-	      		v-model="form.social_media"
-	      		label="Social Media"
-	      		:rules="urlRules"
-	      		required
-	    	></v-text-field>
-
-	    	<v-autocomplete
-	    		v-model="form.region"
-		        :items="regions"
-		        :rules="rules"
-		        autocomplete="new-password"
-		        item-value="id"
-		        item-text="name"
-		        label="Region"
-		        required
-		        @change="findProvincesByRegion(form.region)"
-		    ></v-autocomplete>
-
-	    	<v-autocomplete
-	    		v-model="form.province"
-		        :items="provinces"
-		        :rules="rules"
-		        autocomplete="new-password"
-		        label="Province"
-		        required
-		        @change="findCitiesByProvince(form.province)"
-		    ></v-autocomplete>
-
-		    <v-autocomplete
-	    		v-model="form.city"
-		        :items="cities"
-		        :rules="rules"
-		        autocomplete="new-password"
-		        label="City"
-		        required
-		        @change="findBarangaysByProvinceCity({ provinceName: form.province, cityName: form.city })"
-		    ></v-autocomplete>
-
-		    <v-autocomplete
-	    		v-model="form.barangay"
-		        :items="barangays"
-		        :rules="rules"
-		        autocomplete="new-password"
-		        label="Barangay"
-		        required
-		    ></v-autocomplete>
-
-		    <v-text-field
-	      		v-model="form.street"
-	      		:rules="rules"
-	      		label="House #, Floor #, Street"
-	      		required
-	    	></v-text-field>
-
-	    	<v-select
-	      		v-model="form.type"
-	      		:items="deliveryTypes"
-	      		:rules="rules"
-	      		item-value="id"
-	      		item-text="name"
-	      		label="Delivery Type"
-	      		required
-	    	></v-select>
+	    	<v-row>
+	  			<v-col cols="12">
+			    	<v-textarea
+			      		v-model="form.description"
+			      		:rules="rules"
+			      		outlined
+			      		label="Short description about your store"
+			      		required
+			      		hide-details="auto"
+			    	></v-textarea>
+			    </v-col>
+			    <v-col cols="12">
+			    	<v-text-field
+			      		v-model="form.social_media"
+			      		label="Social Media"
+			      		:rules="urlRules"
+			      		outlined
+			      		required
+			      		hide-details="auto"
+			    	></v-text-field>
+			    </v-col>
+			    <v-col cols="6">
+			    	<v-autocomplete
+			    		v-model="form.region"
+				        :items="regions"
+				        :rules="rules"
+				        autocomplete="new-password"
+				        item-value="id"
+				        item-text="name"
+				        label="Region"
+				        outlined
+				        required
+				        hide-details="auto"
+				        @change="findProvincesByRegion(form.region)"
+				    ></v-autocomplete>
+				</v-col>
+				<v-col cols="6">
+			    	<v-autocomplete
+			    		v-model="form.province"
+				        :items="provinces"
+				        :rules="rules"
+				        autocomplete="new-password"
+				        label="Province"
+				        outlined
+				        required
+				        hide-details="auto"
+				        @change="findCitiesByProvince(form.province)"
+				    ></v-autocomplete>
+				</v-col>
+				<v-col cols="6">
+				    <v-autocomplete
+			    		v-model="form.city"
+				        :items="cities"
+				        :rules="rules"
+				        autocomplete="new-password"
+				        label="City"
+				        outlined
+				        required
+				        hide-details="auto"
+				        @change="findBarangaysByProvinceCity({ provinceName: form.province, cityName: form.city })"
+				    ></v-autocomplete>
+				</v-col>
+				<v-col cols="6">
+				    <v-autocomplete
+			    		v-model="form.barangay"
+				        :items="barangays"
+				        :rules="rules"
+				        autocomplete="new-password"
+				        label="Barangay"
+				        outlined
+				        required
+				        hide-details="auto"
+				    ></v-autocomplete>
+				</v-col>
+				<v-col cols="12">
+				    <v-text-field
+			      		v-model="form.street"
+			      		:rules="rules"
+			      		label="House #, Floor #, Street"
+			      		outlined
+			      		required
+			      		hide-details="auto"
+			    	></v-text-field>
+			    </v-col>
+			    <v-col cols="12">
+			    	<v-select
+			      		v-model="form.type"
+			      		:items="deliveryTypes"
+			      		:rules="rules"
+			      		outlined
+			      		item-value="id"
+			      		item-text="name"
+			      		label="Delivery Type"
+			      		required
+			      		hide-details="auto"
+			    	></v-select>
+			    </v-col>
+			</v-row>
 
 	    	<label>Schedule Day</label>
 
@@ -254,18 +291,25 @@
       			</v-col>
     		</v-row>
 
-	    	<v-btn
-	      		:disabled="disabled"
-	      		color="success"
-	      		class="mr-4"
-	      		@click="submit"
-	    	>
-	      		Submit
-	    	</v-btn>
+    		<v-divider class="my-4" />
+
+    		<v-row>
+    			<v-col class="text-right">
+			    	<v-btn
+			      		:disabled="disabled"
+			      		color="success"
+			      		rounded
+			      		class="px-16 py-6 mb-2"
+			      		@click="submit"
+			    	>
+			      		Submit
+			    	</v-btn>
+			    </v-col>
+			</v-row>
 	  	</v-form>
 	</v-container>
 
-	<v-container fill-height v-else>
+	<v-container v-else>
 		<v-row>
 			<v-col cols="6" class="d-flex flex-row">
 				<div class="text-h4 mb-4">Edit Store</div>

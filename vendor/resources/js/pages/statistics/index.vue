@@ -6,55 +6,56 @@
   }
 </route>
 <template>
-	<div>
-		<v-container>
-			<div class="text-h4 mb-6">Statistics</div>
+	<v-container>
+		<v-row>
+			<v-col cols="12">
+				<div class="text-h4 mb-4">Statistics</div>
+			</v-col>
+		</v-row>
+		<v-row>
+			<v-col cols="12" sm="12" md="6">
+				<v-card>
+					<v-card-title>Total Delivered Sales</v-card-title>
+					<v-card-text>
+						{{ totalSales.toFixed(2) }}
+					</v-card-text>
+				</v-card>
+			</v-col>
+			<v-col cols="12" sm="12" md="6">
+				<v-card>
+					<v-card-title>Total Orders</v-card-title>
+					<v-card-text>
+						{{ totalOrders }}
+					</v-card-text>
+				</v-card>
+			</v-col>
+		</v-row>
 
-			<v-row>
-				<v-col cols="12" sm="12" md="6">
-					<v-card>
-						<v-card-title>Total Delivered Sales</v-card-title>
-						<v-card-text>
-							{{ totalSales.toFixed(2) }}
-						</v-card-text>
-					</v-card>
-				</v-col>
-				<v-col cols="12" sm="12" md="6">
-					<v-card>
-						<v-card-title>Total Orders</v-card-title>
-						<v-card-text>
-							{{ totalOrders }}
-						</v-card-text>
-					</v-card>
-				</v-col>
-			</v-row>
+		<v-row>
+			<v-col cols="12" sm="6" md="3" v-for="item in status" :key="item.id">
+				<v-card>
+					<v-card-title :class="`${ item.color }--text`">{{ item.name }}</v-card-title>
+					<v-card-text>
+						{{ mapStatusOrders(item) }}
+					</v-card-text>
+				</v-card>
+			</v-col>
+		</v-row>
 
-			<v-row>
-				<v-col cols="12" sm="6" md="3" v-for="item in status" :key="item.id">
-					<v-card>
-						<v-card-title :class="`${ item.color }--text`">{{ item.name }}</v-card-title>
-						<v-card-text>
-							{{ mapStatusOrders(item) }}
-						</v-card-text>
-					</v-card>
-				</v-col>
-			</v-row>
+		<v-card class="mt-4">
+			<v-card-title>Sales (Delivered)</v-card-title>
+			<v-card-text>
+				<bar-chart :chartData="salesBarChartData" :options="salesBarOptions"></bar-chart>
+			</v-card-text>
+		</v-card>
 
-			<v-card class="mt-4">
-				<v-card-title>Sales (Delivered)</v-card-title>
-				<v-card-text>
-					<bar-chart :chartData="salesBarChartData" :options="salesBarOptions"></bar-chart>
-				</v-card-text>
-			</v-card>
-
-			<v-card class="mt-4">
-				<v-card-title>Orders (Delivered)</v-card-title>
-				<v-card-text>
-					<bar-chart :chartData="ordersBarChartData" :options="ordersBarOptions"></bar-chart>
-				</v-card-text>
-			</v-card>
-		</v-container>
-	</div>
+		<v-card class="mt-4">
+			<v-card-title>Orders (Delivered)</v-card-title>
+			<v-card-text>
+				<bar-chart :chartData="ordersBarChartData" :options="ordersBarOptions"></bar-chart>
+			</v-card-text>
+		</v-card>
+	</v-container>
 </template>
 
 <script type="text/javascript">

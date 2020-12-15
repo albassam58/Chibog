@@ -123,8 +123,12 @@
     	            vm.totalItems = vm.$store.state[vm.modulePage].items.total;
 
                     vm.loading = false;
+
+                    vm.$emit('done');
                 } catch (err) {
                     vm.loading = false;
+
+                    vm.$emit('done');
                 }
 			},
             searchList: _.debounce(async function(query) {

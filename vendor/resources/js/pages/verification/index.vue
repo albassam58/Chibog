@@ -6,155 +6,160 @@
   }
 </route>
 <template>
-	<div>
-		<v-container>
-			<v-row>
-				<v-col cols="12">
-					<div class="text-h4 mb-4">Verification</div>
-				</v-col>
-			</v-row>
-			<v-stepper v-model="step" v-if="vendor">
-            	<v-stepper-header>
-              		<v-stepper-step step="1" :complete="step > 1 || vendor.mobile_verified_at !== null">
-              			Mobile Verification
-              			<!-- <small v-if="step > 1" class="green--text">Verified</small> -->
-              		</v-stepper-step>
+	<v-container>
+		<v-row>
+			<v-col cols="12">
+				<div class="text-h4 mb-4">Verification</div>
+			</v-col>
+		</v-row>
+		<v-stepper v-model="step" v-if="vendor">
+        	<v-stepper-header>
+          		<v-stepper-step step="1" :complete="step > 1 || vendor.mobile_verified_at !== null">
+          			Mobile Verification
+          			<!-- <small v-if="step > 1" class="green--text">Verified</small> -->
+          		</v-stepper-step>
 
-              		<v-divider></v-divider>
+          		<v-divider></v-divider>
 
-              		<v-stepper-step step="2" :complete="step > 2 || vendor.email_verified_at !== null">
-              			Email Verification
-              		</v-stepper-step>
+          		<v-stepper-step step="2" :complete="step > 2 || vendor.email_verified_at !== null">
+          			Email Verification
+          		</v-stepper-step>
 
-              		<v-divider></v-divider>
+          		<v-divider></v-divider>
 
-              		<!-- <v-stepper-step step="3">Success</v-stepper-step> -->
-            	</v-stepper-header>
+          		<!-- <v-stepper-step step="3">Success</v-stepper-step> -->
+        	</v-stepper-header>
 
-            	<v-stepper-items>
-		            <v-stepper-content step="1">
-		            	<div class="text-center">
-		                	<v-form ref="otpForm" @submit.prevent>
-		                		<v-row>
-		                			<v-col>
-		                				To ensure that you provide a valid mobile number, we need you to verify your mobile number. We sent you an SMS.
-		                			</v-col>
-		                		</v-row>
-		                		<v-row class="mt-4">
-		                			<v-col cols="12" sm="6" md="4" offset-md="4">
-										<v-text-field
-										 	height="60"
-							      			v-model="otp"
-							        		label="OTP"
-							        		outlined
-							        		type="text"
-							                @paste="onPaste = true"
-							                :loading="verifyingOtp"
-							                :disabled="verifyingOtp"
-							                @keyup="verifyOtp"
-							      		></v-text-field>
-							      		<div>
-		                					Didn't receive any code?
-		                				</div>
-		                				<v-btn
-											color="primary"
-											:disabled="sendingOtp"
-											@click="sendOtp"
-										>Resend OTP</v-btn>
-							      	</v-col>
-							    </v-row>
-					      	</v-form>
-		                </div>
-		            </v-stepper-content>
-
-            		<v-stepper-content step="2">
-            			<div class="text-center" v-if="verificationError && !alreadyVerified">
-		                	<v-row>
-	                			<v-col>
-	                				<div>
-	                					Verification Error
-	                				</div>
-	                				<div>
-	                					Either invalid or expired link.
-	                				</div>
-	                			</v-col>
-	                		</v-row>
-	                		<v-row class="mt-4">
-	                			<v-col>
-	                				<v-btn
-										color="primary"
-										:disabled="sendingEmail"
-										@click="resendVerification"
-									>Resend Email</v-btn>
-						      	</v-col>
-						    </v-row>
-		                </div>
-		                <div class="text-center" v-else-if="verificationSuccess">
-		                	<v-row>
-	                			<v-col>
-	                				<div>
-	                					Successfully Verified
-	                				</div>
-	                				<div>
-	                					You are now set. Enjoy using ENKA!
-	                				</div>
-	                				<v-btn
-	                					class="mt-12"
-										color="primary"
-										@click="$router.push('/')"
-									>Return to Home</v-btn>
-	                			</v-col>
-	                		</v-row>
-		                </div>
-                  		<div class="text-center" v-else-if="!alreadyVerified">
+        	<v-stepper-items>
+	            <v-stepper-content step="1">
+	            	<div class="text-center">
+	                	<v-form ref="otpForm" @submit.prevent>
 	                		<v-row>
 	                			<v-col>
-	                				To ensure that you provide a valid email, you need to verify your email. We sent you an email verification.
+	                				To ensure that you provide a valid mobile number, we need you to verify your mobile number. We sent you an SMS.
 	                			</v-col>
 	                		</v-row>
 	                		<v-row class="mt-4">
-	                			<v-col>
+	                			<v-col cols="12" sm="6" md="4" offset-md="4">
+									<v-text-field
+									 	height="60"
+						      			v-model="otp"
+						        		label="OTP"
+						        		outlined
+						        		type="text"
+						                @paste="onPaste = true"
+						                :loading="verifyingOtp"
+						                :disabled="verifyingOtp"
+						                @keyup="verifyOtp"
+						      		></v-text-field>
 						      		<div>
-	                					Didn't receive any email?
+	                					Didn't receive any code?
 	                				</div>
 	                				<v-btn
+	                					class="mt-2"
+	                					rounded
 										color="primary"
-										:disabled="sendingEmail"
-										@click="resendVerification"
-									>Resend Email</v-btn>
+										:disabled="sendingOtp"
+										@click="sendOtp"
+									>Resend OTP</v-btn>
 						      	</v-col>
 						    </v-row>
-		                </div>
-		                <div class="text-center" v-else>
-		                	<v-row>
-	                			<v-col>
-	                				<div>
-	                					Email is already verified.
-	                				</div>
-	                				<div>
-	                					You are now set. Enjoy using ENKA!
-	                				</div>
-	                				<v-btn
-	                					class="mt-12"
-										color="primary"
-										@click="$router.push('/')"
-									>Return to Home</v-btn>
-	                			</v-col>
-	                		</v-row>
-		                </div>
-              		</v-stepper-content>
+				      	</v-form>
+	                </div>
+	            </v-stepper-content>
 
-              		<!-- <v-stepper-content step="3">
-                		<div>
-		                	step 3
-		                </div>
+        		<v-stepper-content step="2">
+        			<div class="text-center" v-if="verificationError && !alreadyVerified">
+	                	<v-row>
+                			<v-col>
+                				<div>
+                					Verification Error
+                				</div>
+                				<div>
+                					Either invalid or expired link.
+                				</div>
+                			</v-col>
+                		</v-row>
+                		<v-row class="mt-4">
+                			<v-col>
+                				<v-btn
+                					rounded
+									color="primary"
+									:disabled="sendingEmail"
+									@click="resendVerification"
+								>Resend Email</v-btn>
+					      	</v-col>
+					    </v-row>
+	                </div>
+	                <div class="text-center" v-else-if="verificationSuccess">
+	                	<v-row>
+                			<v-col>
+                				<div>
+                					Successfully Verified
+                				</div>
+                				<div>
+                					You are now set. Enjoy using ENKA!
+                				</div>
+                				<v-btn
+                					rounded
+                					class="mt-12"
+									color="primary"
+									@click="$router.push('/')"
+								>Return to Home</v-btn>
+                			</v-col>
+                		</v-row>
+	                </div>
+              		<div class="text-center" v-else-if="!alreadyVerified">
+                		<v-row>
+                			<v-col>
+                				To ensure that you provide a valid email, you need to verify your email. We sent you an email verification.
+                			</v-col>
+                		</v-row>
+                		<v-row class="mt-4">
+                			<v-col>
+					      		<div>
+                					Didn't receive any email?
+                				</div>
+                				<v-btn
+                					class="mt-2"
+	                				rounded
+									color="primary"
+									:disabled="sendingEmail"
+									@click="resendVerification"
+								>Resend Email</v-btn>
+					      	</v-col>
+					    </v-row>
+	                </div>
+	                <div class="text-center" v-else>
+	                	<v-row>
+                			<v-col>
+                				<div>
+                					Email is already verified.
+                				</div>
+                				<div>
+                					You are now set. Enjoy using ENKA!
+                				</div>
+                				<v-btn
+                					rounded
+                					class="mt-12"
+									color="primary"
+									@click="$router.push('/')"
+								>Return to Home</v-btn>
+                			</v-col>
+                		</v-row>
+	                </div>
+          		</v-stepper-content>
 
-                		<v-btn text @click.native="step = 2">Previous</v-btn>
-              		</v-stepper-content> -->
-            	</v-stepper-items>
-          	</v-stepper>
-      	</v-container>
-	</div>
+          		<!-- <v-stepper-content step="3">
+            		<div>
+	                	step 3
+	                </div>
+
+            		<v-btn text @click.native="step = 2">Previous</v-btn>
+          		</v-stepper-content> -->
+        	</v-stepper-items>
+      	</v-stepper>
+  	</v-container>
 </template>
 
 <script type="text/javascript">

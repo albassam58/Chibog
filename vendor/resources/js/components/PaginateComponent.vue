@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<v-pagination
+			circle
 			v-model="currentPage"
 			:length="lastPage"
 			:disabled="disabled"

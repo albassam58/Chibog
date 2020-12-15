@@ -125,9 +125,11 @@
 			    	<v-card-actions>
 			      		<v-spacer></v-spacer>
 			      		<v-btn
+			      			rounded
 			        		:disabled="!isEditing || disabled"
 			        		color="primary"
 			        		@click="update"
+			        		class="px-16 py-6"
 			      		>
 			        		Save
 			      		</v-btn>
@@ -187,6 +189,8 @@
 							      			v-model="mobileNumber"
 							        		label="Mobile Number"
 							        		required
+							        		outlined
+							        		hide-details="auto"
 							        		type="text"
 							                :rules="rules"
 							                :disabled="disableUpdateMobileNumber"
@@ -195,23 +199,23 @@
 							      		></v-text-field>
 							      	</v-form>
 								</div>
-								<v-alert type="warning">
+								<v-alert type="warning" class="mt-2">
 									Once you update your mobile number, you will need to verify it via a code sent to your new mobile number. If you fail to verify it, all of your stores will be unavailable in ENKA.
 								</v-alert>
 							</v-col>
 							<v-col class="text-right pt-0">
 			          			<v-btn
 			          				text
-			          				:disabled="disableUpdateMobileNumber"
-			          				color="primary"
-			          				@click="updateMobile"
-			          			>Save</v-btn>
-			          			<v-btn
-			          				text
 			          				color="default"
 			          				:disabled="disableUpdateMobileNumber"
 			          				@click="isMobileEditing = !isMobileEditing"
 			          			>Cancel</v-btn>
+			          			<v-btn
+			          				rounded
+			          				:disabled="disableUpdateMobileNumber"
+			          				color="primary"
+			          				@click="updateMobile"
+			          			>Save</v-btn>
 							</v-col>
 						</v-row>
 						<!-- MOBILE NUMBER UPDATED, FILL OTP -->
@@ -223,6 +227,7 @@
 							      			v-model="otp"
 							        		label="OTP"
 							        		type="number"
+							        		outlined
 							                @paste="onPaste = true"
 							                :loading="verifyingOtp"
 							                :disabled="verifyingOtp"
@@ -233,10 +238,16 @@
 								<v-alert type="warning">
 									Your One-time Password (OTP) will expire in 5 minutes. If you didn't receive any SMS, please resend your OTP:
 									<v-row no-gutters>
-								      	<v-col class="text-right">
+								      	<v-col class="text-center mt-2">
+								      		<v-btn
+								      			text
+												color="grey darken-3"
+												dark
+												@click="isVerifyOtp = !isVerifyOtp"
+											>Cancel</v-btn>
 											<v-btn
-												text
-												color="blue darken-4"
+												rounded
+												color="primary"
 												:disabled="sendingOtp"
 												@click="sendOtp"
 											>Resend OTP</v-btn>
@@ -283,6 +294,8 @@
 							        		label="Email"
 							        		required
 							        		type="email"
+							        		outlined
+							        		hide-details="auto"
 							                :rules="emailRules"
 							                :disabled="disableUpdateEmail"
 							                :loading="disableUpdateEmail"
@@ -290,23 +303,23 @@
 							      		></v-text-field>
 							      	</v-form>
 								</div>
-								<v-alert type="warning">
+								<v-alert type="warning" class="mt-2">
 									Once you update your email, you will need to verify it. If you fail to verify, all of your stores will be unavailable in ENKA.
 								</v-alert>
 							</v-col>
 							<v-col class="text-right pt-0">
 			          			<v-btn
 			          				text
-			          				:disabled="disableUpdateEmail"
-			          				color="primary"
-			          				@click="updateEmail"
-			          			>Save</v-btn>
-			          			<v-btn
-			          				text
 			          				color="default"
 			          				:disabled="disableUpdateEmail"
 			          				@click="isEmailEditing = !isEmailEditing"
 			          			>Cancel</v-btn>
+			          			<v-btn
+			          				rounded
+			          				:disabled="disableUpdateEmail"
+			          				color="primary"
+			          				@click="updateEmail"
+			          			>Save</v-btn>
 							</v-col>
 						</v-row>
 
@@ -320,51 +333,54 @@
 							</v-col>
 						</v-row>
 						<!-- EDIT PASSWORD -->
-						<v-row v-else>
-							<v-col cols="12" sm="12" class="pb-0">
-								<div>
-									<v-form ref="passwordForm" @submit.prevent>
-										<v-text-field
-							      			v-model="password"
-							        		label="Password"
-							        		type="password"
-							        		required
-							                :rules="passwordRules"
-							                :disabled="disableUpdatePassword"
-							                :loading="disableUpdatePassword"
-							                @keyup.enter.prevent="updatePassword"
-							      		></v-text-field>
-							      		<v-text-field
-		                                    id="password_confirmation"
-		                                    label="Password Confirmation"
-		                                    name="password_confirmation"
-		                                    type="password"
-		                                    v-model="confirmPassword"
-		                                    required
-		                                    :rules="rules.concat(passwordConfirmationRule)"
-		                                    :disabled="disableUpdatePassword"
-							                :loading="disableUpdatePassword"
-							                @keyup.enter.prevent="updatePassword"
-		                                ></v-text-field>
-							      	</v-form>
-								</div>
-							</v-col>
-							<v-col class="text-right pt-0">
-			          			<v-btn
-			          				text
-			          				:disabled="disableUpdatePassword"
-			          				color="primary"
-			          				@click="updatePassword"
-			          			>Save</v-btn>
-			          			<v-btn
-			          				text
-			          				color="default"
-			          				:disabled="disableUpdatePassword"
-			          				@click="isPasswordEditing = !isPasswordEditing"
-			          			>Cancel</v-btn>
-							</v-col>
-						</v-row>
-
+						<v-form ref="passwordForm" @submit.prevent v-else>
+							<v-row>
+								<v-col cols="12">
+									<v-text-field
+						      			v-model="password"
+						        		label="Password"
+						        		type="password"
+						        		required
+						        		outlined
+						        		hide-details="auto"
+						                :rules="passwordRules"
+						                :disabled="disableUpdatePassword"
+						                :loading="disableUpdatePassword"
+						                @keyup.enter.prevent="updatePassword"
+						      		></v-text-field>
+						      	</v-col>
+						      	<v-col cols="12">
+						      		<v-text-field
+	                                    id="password_confirmation"
+	                                    label="Password Confirmation"
+	                                    name="password_confirmation"
+	                                    type="password"
+	                                    v-model="confirmPassword"
+	                                    required
+	                                    outlined
+						        		hide-details="auto"
+	                                    :rules="rules.concat(passwordConfirmationRule)"
+	                                    :disabled="disableUpdatePassword"
+						                :loading="disableUpdatePassword"
+						                @keyup.enter.prevent="updatePassword"
+	                                ></v-text-field>
+								</v-col>
+								<v-col class="text-right pt-0">
+				          			<v-btn
+				          				text
+				          				color="default"
+				          				:disabled="disableUpdatePassword"
+				          				@click="isPasswordEditing = !isPasswordEditing"
+				          			>Cancel</v-btn>
+				          			<v-btn
+				          				rounded
+				          				:disabled="disableUpdatePassword"
+				          				color="primary"
+				          				@click="updatePassword"
+				          			>Save</v-btn>
+								</v-col>
+							</v-row>
+						</v-form>
 					</v-card-text>
 				</v-card>
 			</v-col>
@@ -549,6 +565,7 @@
             		await vm.send(form);
 
             		vm.sendingOtp = false;
+            		vm.isVerifyOtp = true;
             	} catch (err) {
             		vm.sendingOtp = false;
             	}

@@ -7,117 +7,102 @@
 </route>
 <template>
 	<v-container>
-
 		<v-row>
 			<v-col
 				cols="6"
 				class="d-flex flex-row"
 			>
-				<div class="text-h4 mb-4">Stores</div>
+				<div class="text-h4 mb-4 primary--text">Maligayang pagbabalik sa <strong>ENKA</strong></div>
 			</v-col>
-			<v-col
-				cols="6"
-				class="d-flex flex-row-reverse"
-			>
-				<v-btn
-					v-if="countStores < limit"
-					color="primary"
-					@click="$router.push('/stores/add')"
+		</v-row>
+		<v-row class="text-subtitle">
+			<v-col cols="6">
+				<v-card
+				    class="mx-auto"
 				>
-					<v-icon>mdi-plus</v-icon>
-					Add Store
-				</v-btn>
+				  	<v-card-title class="primary--text">
+				  		Mga limitasyon ng pag gamit ng ENKA:
+				  	</v-card-title>
+
+				    <v-card-text class="text--primary">
+				      	<li>Hanggang isa (1) lang ang pwedeng i register na store</li>
+						<li>Hanggang labing lima (15) lang ang pwedeng i register na menu</li>
+				    </v-card-text>
+				</v-card>
+			</v-col>
+			<v-col cols="6">
+				<v-card
+				    class="mx-auto"
+				>
+				  	<v-card-title class="primary--text">
+				  		Busilak ba ang iyong PUSO?
+				  	</v-card-title>
+
+				  	<v-card-subtitle>
+				  		Magdonate na sa aming GCASH o PAYMAYA
+				  	</v-card-subtitle>
+
+				    <v-card-text class="text--primary">
+				    	<v-row>
+				    		<v-col cols="12" sm="6">
+				      			QR CODE GCASH
+				      		</v-col>
+				      		<v-col cols="12" sm="6">
+				      			QR CODE PAYMAYA
+				      		</v-col>
+				      	</v-row>
+				    </v-card-text>
+				</v-card>
 			</v-col>
 		</v-row>
 
-		<custom-data-table
-			module="stores/fetch"
-		    :headers="headers"
-		    searchHint="Search by name"
-		    :sortBy="sortBy"
-      		:sortDesc="sortDesc"
-      		ref="table"
-        >
-        	<template v-slot:item="{ item }">
-        		<td>
-        			<a
-	                    :href="imageLink(item)"
-	                    target="blank"
-	                >
-	                    <v-img
-	                        :src="imageLink(item)"
-	                        aspect-ratio="1"
-	                    >
-	                        <template v-slot:placeholder>
-	                            <v-row
-	                                class="fill-height ma-0"
-	                                align="center"
-	                                justify="center"
-	                            >
-	                                <v-progress-circular
-	                                    indeterminate
-	                                    color="grey lighten-5"
-	                                ></v-progress-circular>
-	                            </v-row>
-	                        </template>
-	                    </v-img>
-	                </a>
-        		</td>
-        		<td>
-        			<router-link :to="`/stores/${ item.id }`">
-        				{{ item.name }}
-        			</router-link>
-        		</td>
-        		<td>{{ item.description }}</td>
-        		<td>
-        			<div>{{ capitalize(item.street) }}</div>
-        			<div>Brgy. {{ capitalize(item.barangay) }}</div>
-        			<div>{{ capitalize(item.city) }}</div>
-        		</td>
-        		<td>{{ item.type == 1 ? "Same Day" : "Next Day" }}</td>
-        		<td>
-        			<v-chip
-						v-for="(day, index) in scheduleDay(item)"
-						x-small
-						:key="day.short"
-				      	:color="day.color"
-				      	:dark="day.short == 'Mon' || day.short == 'Thu' ? false : true"
-				    >
-				      	{{ day.short }}
-				    </v-chip>
-				    <div class="text-caption mt-1">
-				    	<v-icon x-small>mdi-calendar-clock</v-icon>
-				    	{{ new Date(`2019-05-05 ${ item.schedule_time_in }`) | moment("hh:mm A") }} - {{ new Date(`2019-05-05 ${ item.schedule_time_out }`) | moment("hh:mm A") | moment("hh:mm A") }}
-				    </div>
-        		</td>
-        		<td>
-        			<div :class="
-	        			{
-		        			'grey--text': item.status == 1,
-		        			'green--text': item.status == 2,
-		        			'red--text': item.status == 3
-		        		}
-		        	">{{ item.status_value }}</div>
-        			<div class="text-caption">{{ item.remarks }}</div>
-        		</td>
-        		<td class="text-center">
-        			<v-tooltip bottom>
-	                    <template v-slot:activator="{ on, attrs }">
-	                        <v-btn
-	                            icon
-	                            color="primary"
-	                            v-bind="attrs"
-	                            v-on="on"
-	                            @click="$router.push(`/stores/${ item.id }/edit`)">
-	                            <v-icon>mdi-pencil</v-icon>
-	                        </v-btn>
-	                    </template>
-	                    <span>Edit</span>
-	                </v-tooltip>
-        		</td>
-        	</template>
-        </custom-data-table>
+		<v-divider />
 
+		<v-row>
+			<v-col cols="12">
+				<div class="text-h4 mb-4 primary--text">Announcements</div>
+			</v-col>
+			<v-col cols="12" sm="12" md="4" v-for="n in 4" :key="n">
+				<v-card
+				    class="mx-auto"
+				    max-width="400"
+				>
+				    <v-img
+				      	class="white--text align-end"
+				      	height="200px"
+				      	src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+				    >
+				      	<v-card-title>Top 10 Australian beaches</v-card-title>
+				    </v-img>
+
+				    <v-card-subtitle class="pb-0">
+				      	Number 10
+				    </v-card-subtitle>
+
+				    <v-card-text class="text--primary">
+				      	<div>Whitehaven Beach</div>
+
+				      	<div>Whitsunday Island, Whitsunday Islands</div>
+				    </v-card-text>
+
+				    <v-card-actions>
+				      	<v-btn
+				        	color="orange"
+				        	text
+				      	>
+				        	Share
+				      	</v-btn>
+
+				      	<v-btn
+				        	color="orange"
+				        	text
+				      	>
+				        	Explore
+				      	</v-btn>
+				    </v-card-actions>
+				</v-card>
+			</v-col>
+		</v-row>
 	</v-container>
 </template>
 
@@ -126,20 +111,12 @@
 
 	export default {
 		data: () => ({
-			limit: 1,
-			countStores: 0,
-			headers: [
-				{ text: "Picture", value: "logo", sortable: false },
-				{ text: "Name", value: "name" },
-				{ text: "Description", value: "description", sortable: false },
-				{ text: "Address", value: "", sortable: false },
-				{ text: "Delivery", value: "type", sortable: false },
-				{ text: "Schedule", value: "", sortable: false },
-				{ text: "Status", value: "status" },
-				{ text: "Action", align: "center", sortable: false }
-			],
-			sortBy: ['status', 'name'],
-            sortDesc: [false, false],
+			icons: [
+		        'mdi-facebook',
+		        'mdi-twitter',
+		        'mdi-linkedin',
+		        'mdi-instagram',
+		      ],
 		}),
 		async created() {
 			let vm = this;
@@ -159,33 +136,13 @@
 		},
 		computed: {
 			...mapState({
-				stores: state => state.stores.items,
 				vendor: state => state.currentVendor.vendor,
 			})
 		},
 		methods: {
 			...mapActions({
 				'getVendor': 'currentVendor/getVendor'
-			}),
-			imageLink(item) {
-        		let vm = this;
-        		let placeholder = "https://via.placeholder.com/300/FFFFFF/000000?text=No Image";
-
-        		return item.logo ? `/${ item.logo }` : placeholder;
-        	}
+			})
 		},
-		watch: {
-			stores: {
-				deep: true,
-				handler(val) {
-					let vm = this;
-
-					vm.countStores = _.filter(val.data, function(object) {
-						// rejected is not counted
-						if (object.status != 3) return object
-					}).length;
-				}
-			}
-		}
 	}
 </script>
