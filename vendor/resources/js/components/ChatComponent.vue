@@ -226,13 +226,15 @@
 				});
 
 				if (customerIndex < 0) {
+					// push at first index
 					vm.customers.unshift(data.data);
 				} else {
+					// move new message at the top of the customers list
 					vm.moveArray(vm.customers, customerIndex, 0);
 					vm.customers[0].message = data.data.message;
 
 					// if the incoming message is from active message, update status to 2 already
-					if (vm.selected.user_id == vm.customers[0].user_id) {
+					if (vm.selected && (vm.selected.user_id == vm.customers[0].user_id)) {
 						await vm.update({ id: data.data.id, status: 2 });
 						vm.customers[0].status = 2;
 					} else {
