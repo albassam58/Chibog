@@ -4,7 +4,7 @@
     >
       	<v-row class="no-gutters elevation-4">
         	<v-col
-          		cols="12" sm="3"
+          		cols="12" sm="4"
           		class="flex-grow-1 flex-shrink-0"
           		style="border-right: 1px solid #0000001f;"
         	>
@@ -59,6 +59,13 @@
 	                		</template>
               			</v-list-item-group>
             		</v-list>
+            		<v-pagination
+						circle
+						v-model="currentPage"
+						:length="lastPage"
+						:total-visible="5"
+						:disabled="paginateDisabled"
+					></v-pagination>
           		</v-responsive>
         	</v-col>
 	        <!-- ACTIVE CHAT -->
@@ -147,11 +154,20 @@
 		data: () => ({
 			form: {},
 			disabled: false,
+			paginateDisabled: false,
+			lastPage: 1,
+			currentPage: 1,
 			activeChat: null,
 			customers: [],
 			selected: null,
 		    avatar: null,
 		    open: [],
+		    customerOptions: {
+		    	page: 1,
+                itemsPerPage: 10,
+                sortBy: ['id'],
+                sortDesc: [true]
+		    },
 		    options: {
 		    	page: 1,
                 itemsPerPage: 10,
@@ -169,17 +185,16 @@
 	    async created() {
 	    	let vm = this;
 
-	    	let params = vm.$serialize(vm.options);
+	    	let params = vm.$serialize(vm.customerOptions);
             await vm.$store.dispatch('chats/fetchCustomers', params);
             vm.customers = vm.$store.state['chats'].customers.data;
+            vm.lastPage = vm.$store.state['chats'].customers.last_page;
 	    },
 	    computed: {
 			...mapState({
 				items: state => state.chats.items,
 				item: state => state.chats.item
 			})
-		},
-		mounted() {    
 		},
 		updated() {
 		    let chat = this.$refs.chatDiv
@@ -339,6 +354,24 @@
 					if (container) container.scrollTop = container.scrollHeight;
 	            }, 0)
     		},
+    		async currentPage(newVal, oldVal) {
+				if (oldVal) {
+					let vm = this;
+
+					try {
+						vm.paginateDisabled = true;
+
+						vm.customerOptions.page = newVal;
+						let params = vm.$serialize(vm.customerOptions);
+			            await vm.$store.dispatch('chats/fetchCustomers', params);
+			            vm.customers = vm.$store.state['chats'].customers.data;
+
+			            vm.paginateDisabled = false;
+			        } catch (err) {
+			        	vm.paginateDisabled = false;
+			        }
+				}
+			}
     	},
     	beforeDestroy() {
     		let chat = this.$refs.chatDiv
