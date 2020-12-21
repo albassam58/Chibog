@@ -15,6 +15,7 @@ require('laravel-mix-vue-auto-routing');
 mix.webpackConfig({
 	resolve: {
 		alias: {
+			"@env": path.resolve(__dirname, "vue-env"),
 			"@pages": path.resolve(__dirname, "resources/js/pages"),
 			"@components": path.resolve(__dirname, "resources/js/components")
 		}

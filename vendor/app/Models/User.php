@@ -12,6 +12,16 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    protected $appends = ['full_name', 'reversed_full_name'];
+
+    public function getFullNameAttribute() {
+        return $this->first_name . " " . $this->last_name;
+    }
+
+    public function getReversedFullNameAttribute() {
+        return $this->last_name . ", " . $this->first_name;
+    }
+
     /**
      * The attributes that are mass assignable.
      *

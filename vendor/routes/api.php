@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\v1\AuthenticateController;
 use App\Http\Controllers\API\v1\BarangayController;
+use App\Http\Controllers\API\v1\ChatController;
 use App\Http\Controllers\API\v1\CityController;
 use App\Http\Controllers\API\v1\CuisineController;
 use App\Http\Controllers\API\v1\FoodTypeController;
@@ -62,6 +63,10 @@ Route::group(['prefix' => 'v1/vendor'], function() {
 });
 
 Route::group(['prefix' => 'v1', 'middleware' => ['auth:sanctum', 'vendor_is_verified']], function() {
+
+	// chat
+	Route::get('/chats/customers', [ChatController::class, 'customer']);
+	Route::apiResource('chats', ChatController::class);
 
 	// stores
 	Route::post('/stores/upload', [StoreController::class, 'upload']);

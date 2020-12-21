@@ -91,6 +91,23 @@
                     </v-list-item-icon>
                     <v-list-item-title>Stores</v-list-item-title>
                 </v-list-item>
+                <v-list-item link to="/chats" v-if="vendor.email_verified_at && vendor.mobile_verified_at">
+                    <v-list-item-icon>
+                        <v-badge
+                            v-if="hasUnreadMessage"
+                            color="blue"
+                            dot
+                            offset-x="7"
+                            offset-y="7"
+                        >
+                            <v-icon>mdi-message-text</v-icon>
+                        </v-badge>
+                        <v-icon v-else>mdi-message-text</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>
+                        Messages
+                    </v-list-item-title>
+                </v-list-item>
                 <v-list-item link to="/vendor">
                     <v-list-item-icon>
                         <v-icon>mdi-account</v-icon>
@@ -121,19 +138,22 @@
         </v-navigation-drawer>
 
         <v-content>
-            <router-view :key="$route.fullPath" />
+            <router-view ref="router" :key="$route.fullPath" />
         </v-content>
     </v-app>
 </template>
 <script type="text/javascript">
 	import { mapGetters, mapState, mapActions } from 'vuex'
+    import Chat from '@components/ChatComponent'
     import OrderNotification from '@components/OrderNotificationComponent'
 
 	export default {
         components: {
+            Chat,
             OrderNotification
         },
 		data: () => ({
+            hasUnreadMessage: false,
             alreadyVerified: false,
             excludeApp: [
                 'login',
@@ -161,7 +181,7 @@
 
             if (vm.vendor) {
                 // Connect to Socket.io
-                let socket = io(`http://localhost:3000`);
+                let socket = io(env.consumer.socket);
 
                 // ... listen for new events/messages
                 socket.on(`order-${ vm.vendor.id }:App\\Events\\Order`, data => {
@@ -171,13 +191,22 @@
                     //     this.messages.push(data.data);
                     // }
                 });
+
+                // ... listen for new events/messages
+                socket.on(`chat-from-customer-${ vm.vendor.id }:App\\Events\\Chat`, data => {
+                    // push to messages
+                    vm.$refs.router.$refs.chat.pushData(data.data);
+                    // add blue color to sidebar
+                    vm.hasUnreadMessage = true;
+                });
             }
 		},
 		computed: {
 			...mapState({
 				authenticated: state => state.currentVendor.authenticated,
 				vendor: state => state.currentVendor.vendor,
-                verification: state => state.verification.verification
+                verification: state => state.verification.verification,
+                customers: state => state.chats.customers
 			})
 		},
 		methods: {
@@ -200,6 +229,23 @@
 
                 window.location.href = "/login";
 			}
-		}
+		},
+        watch: {
+            customers: {
+                deep: true,
+                handler(val) {
+                    let vm = this;
+                    // check if there's unread messages
+                    if (val && val.data.length) {
+                        let index = _.findIndex(val.data, { 'status': 1, 'model': 'User' });
+                        if (index >= 0) {
+                            vm.hasUnreadMessage = true;
+                        } else {
+                            vm.hasUnreadMessage = false;
+                        }
+                    }
+                }
+            }
+        }
 	}
 </script>

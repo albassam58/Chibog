@@ -27,10 +27,12 @@ import vuetify from "./plugins/vuetify";
 import store from "./store";
 import Axios from "./axios"
 import Toasted from 'vue-toasted';
+import env from "@env/index";
 
 import CustomDataTable from '@components/CustomDataTableComponent'
 
 window.axios = Axios;
+window.env = env;
 
 // global functions
 const MyPlugin = {
@@ -154,5 +156,6 @@ const app = new Vue({
     router,
     vuetify,
     store,
+    env,
     render: h => h(App)
 });
