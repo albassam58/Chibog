@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -32,6 +33,14 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        //
+        $this->renderable(function (AuthenticationException $e, $request) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success'   => false,
+                    'data'      => [],
+                    'message'   => "Unauthenticated"
+                ], 401);
+            }
+        });
     }
 }

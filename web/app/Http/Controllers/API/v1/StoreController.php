@@ -18,13 +18,20 @@ class StoreController extends BaseController
     public function index(Request $request)
     {
         try {
+            $params = $request->all();
+
             $query = new Store();
 
-            if ($request->exclude) {
-                $query = $query->where('city', '<>', $request->exclude);
+            if (isset($request->excludeCity)) {
+                $query = $query->where('city', '<>', $request->excludeCity);
             }
+
+            if (isset($request->search)) {
+                $query = $query->search($request->search);
+            }
+
             $query = $query->withCount('reviews')->with('vendor')->where('status', 2);
-            $stores = $this->applySearch($query);
+            $stores = $this->applySearch($query, $params);
 
             return $this->sendResponse($stores);
         } catch (\Exception $e) {
@@ -38,29 +45,29 @@ class StoreController extends BaseController
      * @param  string  $query
      * @return \Illuminate\Http\Response
      */
-    public function search($query)
-    {
-        try {
-            $stores = new Store();
+    // public function search($query)
+    // {
+    //     try {
+    //         $stores = new Store();
 
-            if ($query) {
-                $stores = $stores->where(function($q) use($query) {
-                    $q->where('name', 'LIKE', "%$query%")
-                    ->orWhere('region', 'LIKE', "%$query%")
-                    ->orWhere('province', 'LIKE', "%$query%")
-                    ->orWhere('city', 'LIKE', "%$query%")
-                    ->orWhere('barangay', 'LIKE', "%$query%")
-                    ->orWhere('street', 'LIKE', "%$query%");
-                })->where('status', 2);
-            }
+    //         if ($query) {
+    //             $stores = $stores->where(function($q) use($query) {
+    //                 $q->where('name', 'LIKE', "%$query%")
+    //                 ->orWhere('region', 'LIKE', "%$query%")
+    //                 ->orWhere('province', 'LIKE', "%$query%")
+    //                 ->orWhere('city', 'LIKE', "%$query%")
+    //                 ->orWhere('barangay', 'LIKE', "%$query%")
+    //                 ->orWhere('street', 'LIKE', "%$query%");
+    //             })->where('status', 2);
+    //         }
 
-            $stores = $stores->with('vendor');
-            $stores = $this->applySearch($stores);
-            return $this->sendResponse($stores);
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
+    //         $stores = $stores->with('vendor');
+    //         $stores = $this->applySearch($stores);
+    //         return $this->sendResponse($stores);
+    //     } catch (\Exception $e) {
+    //         return $this->sendError($e->getMessage());
+    //     }
+    // }
 
     /**
      * Display a listing of the resource.
@@ -68,12 +75,14 @@ class StoreController extends BaseController
      * @param  string  $city
      * @return \Illuminate\Http\Response
      */
-    public function city($city)
+    public function city(Request $request)
     {
         try {
+            $params = $request->all();
+
             $query = new Store();
-            $query = $query->where('city', $city)->where('status', 2)->withCount('reviews')->with('vendor');
-            $stores = $this->applySearch($query);
+            $query = $query->where('city', $request->cityName)->where('status', 2)->withCount('reviews')->with('vendor');
+            $stores = $this->applySearch($query, $params);
             return $this->sendResponse($stores);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
