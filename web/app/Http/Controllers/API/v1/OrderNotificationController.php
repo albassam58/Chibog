@@ -43,7 +43,7 @@ class OrderNotificationController extends BaseController
                 return $this->sendResponse($orderNotification);
             }
 
-            return $orderNotification;
+            return $this->sendResponse($orderNotification);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

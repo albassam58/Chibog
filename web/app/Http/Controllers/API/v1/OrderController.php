@@ -50,22 +50,6 @@ class OrderController extends BaseController
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @param  string  $query
-     * @return \Illuminate\Http\Response
-     */
-    public function search($query)
-    {
-        try {
-            $orders = Order::where('transaction_id', $query)->with(['item', 'store', 'store.vendor'])->get();
-            return $this->sendResponse($orders);
-        } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
-        }
-    }
-
-    /**
      * Check if user has order.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -95,11 +79,15 @@ class OrderController extends BaseController
     public function user(Request $request)
     {
         try {
-            $search = [ "query" => "", "columns" => [] ];
-            $filters = $request->filters;
+            $params = $request->all();
+            $searchColumns = ['transaction_id'];
+
             $query = new Order();
+
             $query = $query->where('created_by', Auth::user()->id)->where('status', '>', 1)->with(['item', 'store', 'store.vendor']);
-            $orders = $this->applySearch($query, $search, $filters);
+
+            $orders = $this->applySearch($query, $params, $searchColumns);
+
             return $this->sendResponse($orders);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
@@ -207,6 +195,8 @@ class OrderController extends BaseController
                         'customer_street'           => $form['customer_street'],
                         'customer_mobile_number'    => $form['customer_mobile_number'],
                         'customer_email'            => $form['customer_email'],
+                        'customer_gender'           => $form['customer_gender'],
+                        'customer_birthday'         => $form['customer_birthday'],
                         'status'                    => $form['status']
                     ]);
 
